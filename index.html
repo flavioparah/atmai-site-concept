@@ -316,7 +316,7 @@
             flex-grow: 1; padding: 1rem 0;
         }
         #bug-info {
-            opacity: 0; transition: opacity 0.3s;
+            opacity: 0; transition: opacity 0.3s; /* starts completely hidden */
             max-width: 380px; width: 100%;
         }
         .logic-card {
@@ -1142,11 +1142,139 @@ function initPage3() {
 
     const suitGroup = new THREE.Group();
     const ironMat = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.8, metalness: 0.2 });
-    suitGroup.add(new THREE.Mesh(new THREE.BoxGeometry(2,2.5,1), ironMat));
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.8,24,24), ironMat); head.position.y = 1.8; suitGroup.add(head);
-    const visor = new THREE.Mesh(new THREE.SphereGeometry(0.65,24,12,0,Math.PI*2,0,Math.PI/2), new THREE.MeshStandardMaterial({ color: 0x000000 }));
-    visor.rotation.x = Math.PI/2; visor.position.set(0,1.8,0.4); suitGroup.add(visor);
-    p3Astronaut = suitGroup; p3Astronaut.position.y = -3; p3Scene.add(p3Astronaut);
+    
+    // Torso
+    const torso = new THREE.Mesh(new THREE.BoxGeometry(1.4,2.2,0.8), ironMat);
+    suitGroup.add(torso);
+    
+    // Neck - cylinder connecting torso to head
+    const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 0.4, 8), ironMat);
+    neck.position.y = 1.3; // top of torso
+    suitGroup.add(neck);
+    
+    // Head
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.6,24,24), ironMat); 
+    head.position.y = 1.7; // above neck
+    suitGroup.add(head);
+    
+    // Visor - improved glass material, centered and darker
+    const visor = new THREE.Mesh(new THREE.SphereGeometry(0.5,24,12,0,Math.PI*2,0,Math.PI/2), 
+        new THREE.MeshStandardMaterial({ 
+            color: 0x000511, // darker blue tone
+            transparent: true, 
+            opacity: 0.8,   // more opaque
+            metalness: 0.2,
+            roughness: 0.03,
+            envMapIntensity: 1.2
+        }));
+    visor.rotation.x = Math.PI/2; 
+    visor.position.set(0, 1.7, 0.25); // centered on head (z reduced from 0.3 to 0.25)
+    suitGroup.add(visor);
+    
+    // Glass reflection on visor
+    const reflection = new THREE.Mesh(new THREE.SphereGeometry(0.52,24,12,0,Math.PI*2,0,Math.PI/2), 
+        new THREE.MeshBasicMaterial({ 
+            color: 0xffffff, 
+            transparent: true, 
+            opacity: 0.15,
+            blending: THREE.AdditiveBlending 
+        })
+    );
+    reflection.rotation.x = Math.PI/2; 
+    reflection.position.set(-0.15,1.7,0.4); // offset for glass highlight effect
+    suitGroup.add(reflection);
+    
+    // Sad face on visor - create with simple geometry
+    const sadFaceGroup = new THREE.Group();
+    
+    // Eyes (two small spheres)
+    const eyeGeo = new THREE.SphereGeometry(0.04, 8, 8);
+    const eyeMat = new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.8 });
+    const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
+    leftEye.position.set(-0.08, 0.08, 0);
+    const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
+    rightEye.position.set(0.08, 0.08, 0);
+    sadFaceGroup.add(leftEye, rightEye);
+    
+    // Sad mouth (curved line using torus)
+    const mouthGeo = new THREE.TorusGeometry(0.08, 0.015, 4, 12, Math.PI);
+    const mouthMat = new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.8 });
+    const mouth = new THREE.Mesh(mouthGeo, mouthMat);
+    mouth.position.set(0, -0.05, 0);
+    mouth.rotation.z = Math.PI; // flip to make it sad (frown)
+    sadFaceGroup.add(mouth);
+    
+    // Position sad face on visor surface
+    sadFaceGroup.position.set(0, 1.7, 0.45);
+    suitGroup.add(sadFaceGroup);
+    
+    // Arms - positioned higher from shoulders and extended more outward
+    const armGeo = new THREE.CylinderGeometry(0.18, 0.15, 1.8, 8);
+    const leftArm = new THREE.Mesh(armGeo, ironMat);
+    leftArm.position.set(-1.1, 1.0, 0); // higher (y=1.0) and more outward (x=-1.1)
+    leftArm.rotation.z = Math.PI/5; // more angled outward
+    suitGroup.add(leftArm);
+    
+    const rightArm = new THREE.Mesh(armGeo, ironMat);
+    rightArm.position.set(1.1, 1.0, 0); // higher (y=1.0) and more outward (x=1.1)
+    rightArm.rotation.z = -Math.PI/5; // more angled outward
+    suitGroup.add(rightArm);
+    
+    // Gloves/Hands at end of arms - properly calculated positions
+    const gloveGeo = new THREE.SphereGeometry(0.22, 16, 16);
+    const gloveMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.9, metalness: 0.1 });
+    
+    // Calculate exact glove positions at the end of angled arms
+    const armLength = 0.9; // half of arm length (1.8/2)
+    const angle = Math.PI/5; // same angle as arms
+    
+    const leftGlove = new THREE.Mesh(gloveGeo, gloveMat);
+    leftGlove.position.set(
+        -1.1 - Math.sin(angle) * armLength,  // x: arm base + horizontal offset
+        1.0 - Math.cos(angle) * armLength,   // y: arm base + vertical drop
+        0
+    );
+    suitGroup.add(leftGlove);
+    
+    const rightGlove = new THREE.Mesh(gloveGeo, gloveMat);
+    rightGlove.position.set(
+        1.1 + Math.sin(angle) * armLength,   // x: arm base + horizontal offset
+        1.0 - Math.cos(angle) * armLength,   // y: arm base + vertical drop  
+        0
+    );
+    suitGroup.add(rightGlove);
+    
+    // Legs  
+    const legGeo = new THREE.CylinderGeometry(0.25, 0.2, 2.4, 8);
+    const leftLeg = new THREE.Mesh(legGeo, ironMat);
+    leftLeg.position.set(-0.35, -2.3, 0);
+    suitGroup.add(leftLeg);
+    
+    const rightLeg = new THREE.Mesh(legGeo, ironMat);
+    rightLeg.position.set(0.35, -2.3, 0);
+    suitGroup.add(rightLeg);
+    
+    // Boots
+    const bootGeo = new THREE.BoxGeometry(0.5, 0.25, 0.8);
+    const leftBoot = new THREE.Mesh(bootGeo, ironMat);
+    leftBoot.position.set(-0.35, -3.5, 0.1);
+    suitGroup.add(leftBoot);
+    
+    const rightBoot = new THREE.Mesh(bootGeo, ironMat);
+    rightBoot.position.set(0.35, -3.5, 0.1);
+    suitGroup.add(rightBoot);
+    
+    p3Astronaut = suitGroup; 
+    p3Astronaut.position.y = 2.0; // more in middle of screen, lower position
+    p3Scene.add(p3Astronaut);
+
+    // Astronaut physics state
+    p3Astronaut.userData = {
+        restY: 2.0,      // middle of screen position
+        pushedY: -2.0,   // pushed down well below bug box
+        targetY: 2.0,    // current target matches restY
+        velocity: 0      // smooth motion
+    };
 
     p3Barrier = new THREE.Mesh(new THREE.PlaneGeometry(20,20), new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.05, wireframe: true, side: THREE.DoubleSide }));
     p3Barrier.rotation.x = Math.PI/2; p3Barrier.position.y = 2.5; p3Scene.add(p3Barrier);
@@ -1164,24 +1292,55 @@ function initPage3() {
     const bugInfo = document.getElementById('bug-info');
     const vLabels = ['v-sat','v-cit','v-ananda'].map(id => document.getElementById(id));
 
-    trigger.addEventListener('pointerdown', e => {
+    // Debug: verify astronaut exists
+    console.log('Astronaut created:', !!p3Astronaut, p3Astronaut?.userData);
+
+    trigger.addEventListener('mousedown', e => {
+        console.log('Button mousedown triggered!');
         if (e.cancelable) e.preventDefault();
         p3Processing = true;
-        bugInfo.style.opacity = '1';
+        bugInfo.style.transition = 'opacity 0.3s ease-in'; // smooth fade in
+        bugInfo.style.opacity = '0.85'; // 85% opacity instead of 15%
         document.getElementById('page3').classList.add('glitch-active');
         vLabels.forEach(l => l.style.opacity = '1');
+        
+        // 💥 Push astronaut down when bug frame appears
+        if (p3Astronaut && p3Astronaut.userData) {
+            console.log('Before push - current Y:', p3Astronaut.position.y, 'target Y:', p3Astronaut.userData.targetY);
+            p3Astronaut.userData.targetY = p3Astronaut.userData.pushedY;
+            console.log('After push - new target Y:', p3Astronaut.userData.targetY);
+        } else {
+            console.log('ERROR: Astronaut or userData not found!');
+        }
+        
         if (globalAudioOn) {
             const ac = getAC();
             p3BugGain.gain.setTargetAtTime(0.6, ac.currentTime, 0.03);
         }
     });
-    window.addEventListener('pointerup', () => {
+
+    const stopProcessing = () => {
+        console.log('Stop processing triggered!');
         p3Processing = false;
+        bugInfo.style.transition = 'opacity 0.4s ease-out'; // smooth fade out
         bugInfo.style.opacity = '0';
         document.getElementById('page3').classList.remove('glitch-active');
         vLabels.forEach(l => l.style.opacity = '0');
+        
+        // ↩️ Return astronaut to floating position
+        if (p3Astronaut && p3Astronaut.userData) {
+            console.log('Before return - current Y:', p3Astronaut.position.y, 'target Y:', p3Astronaut.userData.targetY);
+            p3Astronaut.userData.targetY = p3Astronaut.userData.restY;
+            console.log('After return - new target Y:', p3Astronaut.userData.targetY);
+        } else {
+            console.log('ERROR: Astronaut or userData not found on release!');
+        }
+        
         p3BugGain.gain.setTargetAtTime(0, getAC().currentTime, 0.12);
-    });
+    };
+
+    trigger.addEventListener('mouseup', stopProcessing);
+    document.addEventListener('mouseup', stopProcessing);
 
     p3Animate();
 }
@@ -1214,8 +1373,30 @@ function p3Animate() {
     requestAnimationFrame(p3Animate);
     if (currentPage !== 3) return;
     const t = p3Clock.getElapsedTime();
+    const dt = p3Clock.getDelta();
+    
     p3Soul.rotation.y += 0.02;
-    p3Astronaut.position.y = -3 + Math.sin(t*0.5)*0.3;
+
+    // ✨💥↩️ Astronaut ontological physics - DIRECT MOVEMENT
+    const astro = p3Astronaut.userData;
+    
+    // Direct movement toward target (no spring physics, just lerp)
+    const moveSpeed = 8.0; // very fast movement
+    const diff = astro.targetY - p3Astronaut.position.y;
+    
+    if (Math.abs(diff) > 0.05) { // if not close enough to target
+        p3Astronaut.position.y += Math.sign(diff) * moveSpeed * dt;
+        
+        // Clamp to target if we overshoot
+        if (Math.sign(astro.targetY - p3Astronaut.position.y) !== Math.sign(diff)) {
+            p3Astronaut.position.y = astro.targetY;
+        }
+    }
+    
+    // Minimal floating oscillation when at rest (almost static)
+    if (!p3Processing) {
+        p3Astronaut.position.y += Math.sin(t * 0.6) * 0.003; // ultra-minimal 0.3cm float
+    }
 
     p3Vectors.forEach((v, i) => {
         const pos = v.geometry.attributes.position.array;
