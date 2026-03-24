@@ -1,9 +1,1560 @@
-<html>
+<!DOCTYPE html>
+<html lang="pt-br">
 <head>
-    <title>Atmai Site</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AtmAI — Sequência Ontológica</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;400;700&family=Playfair+Display:ital,wght@0,400;0,900;1,400&family=Cinzel:wght@400;700&family=Syncopate:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --cyan: #00ffff;
+            --magenta: #ff00ff;
+            --gold: #ffcc33;
+            --red: #ff2244;
+            --white: #f0f0f0;
+            --dark: #000000;
+        }
+
+        html, body {
+            width: 100%; height: 100%;
+            background: #000;
+            overflow: hidden;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* ─── PAGE SYSTEM ─────────────────────────────────────── */
+        .page {
+            position: fixed;
+            inset: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.9s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: 1;
+        }
+        .page.active {
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 2;
+        }
+
+        /* ─── SHARED NAVIGATION ───────────────────────────────── */
+        .nav-bar {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            z-index: 200;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 24px;
+            pointer-events: auto;
+        }
+
+        .nav-btn {
+            background: none;
+            border: 1px solid currentColor;
+            color: var(--cyan);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 8px;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            padding: 10px 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: currentColor;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .nav-btn:hover::before { opacity: 0.08; }
+        .nav-btn:hover {
+            box-shadow: 0 0 20px rgba(0,255,255,0.3);
+            text-shadow: 0 0 8px currentColor;
+        }
+        .nav-btn.gold { color: var(--gold); }
+        .nav-btn.gold:hover { box-shadow: 0 0 20px rgba(255,204,51,0.3); }
+
+        /* Global audio toggle — fixed top-right */
+        #global-audio-btn {
+            position: fixed;
+            top: 16px; right: 16px;
+            z-index: 9999;
+            background: rgba(0,0,0,0.7);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.35);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 7px;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            padding: 8px 14px;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+            display: flex; align-items: center; gap: 7px;
+        }
+        #global-audio-btn .audio-icon {
+            width: 12px; height: 12px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        #global-audio-btn.audio-on {
+            border-color: rgba(0,255,255,0.4);
+            color: var(--cyan);
+            box-shadow: 0 0 12px rgba(0,255,255,0.15);
+        }
+        #global-audio-btn:hover {
+            border-color: rgba(0,255,255,0.6);
+            color: var(--cyan);
+        }
+
+        /* page indicator dots */
+        .page-dots {
+            display: flex; gap: 6px; align-items: center;
+        }
+        .dot {
+            width: 5px; height: 5px; border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            transition: all 0.4s ease;
+        }
+        .dot.active { background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+
+        /* ═══════════════════════════════════════════════════════
+           PAGE 1 — MOSCA / CONECTOMA
+        ═══════════════════════════════════════════════════════ */
+        #page1 { background: #000; }
+
+        #canvas1 { position: absolute; inset: 0; }
+
+        .p1-ui {
+            position: absolute; inset: 0; z-index: 10;
+            display: flex; flex-direction: column;
+            justify-content: space-between;
+            pointer-events: none;
+            padding: 2rem 2rem 0;
+        }
+
+        .p1-header {
+            text-align: center;
+            padding-top: 1.5rem;
+        }
+        .p1-chapter {
+            font-size: 8px; letter-spacing: 0.6em;
+            color: rgba(255,255,255,0.2); text-transform: uppercase;
+            display: block; margin-bottom: 1.5rem;
+        }
+        .p1-quote {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(0.85rem, 2.5vw, 1.25rem);
+            font-style: italic;
+            color: rgba(255,255,255,0.9);
+            line-height: 1.7;
+            max-width: 700px;
+            margin: 0 auto 1rem;
+        }
+        .guna-tags {
+            display: flex; justify-content: center; gap: 10px;
+            margin-bottom: 0.8rem; flex-wrap: wrap;
+        }
+        .guna-tag {
+            font-size: 8px; letter-spacing: 0.3em;
+            padding: 3px 12px; font-weight: 700;
+        }
+        .sattva { color: var(--cyan); border: 1px solid rgba(0,255,255,0.4); }
+        .rajas  { color: #f87171; border: 1px solid rgba(248,113,113,0.4); }
+        .tamas  { color: #94a3b8; border: 1px solid rgba(148,163,184,0.4); }
+        .gita-ref {
+            font-size: 9px; letter-spacing: 0.5em;
+            color: var(--gold); text-transform: uppercase;
+            display: block; margin-bottom: 0.5rem;
+        }
+
+        .p1-bottom {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            gap: 1rem; margin-bottom: 5rem;
+            flex-wrap: wrap;
+        }
+        .info-card {
+            background: rgba(255,255,255,0.02);
+            border-left: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(4px);
+            padding: 1rem 1.2rem;
+            max-width: 300px;
+            pointer-events: auto;
+        }
+        .info-card h3 {
+            font-size: 7px; letter-spacing: 0.3em;
+            color: rgba(255,255,255,0.3); text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+        .info-card p {
+            font-size: 10px; color: rgba(255,255,255,0.55);
+            line-height: 1.7;
+        }
+        .ref-link {
+            font-size: 7px; color: #475569; display: block;
+            margin-top: 6px; text-transform: uppercase;
+        }
+
+        /* splash */
+        #splash1 {
+            position: absolute; inset: 0; z-index: 100;
+            background: radial-gradient(circle at center, #050505 0%, #000 100%);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            transition: opacity 1.2s ease;
+        }
+        .fly-icon {
+            width: 70px; height: 70px; margin-bottom: 20px;
+            filter: drop-shadow(0 0 12px rgba(0,255,255,0.6));
+            animation: float-fly 3s infinite ease-in-out;
+        }
+        @keyframes float-fly { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+        .wing-l { transform-origin: center right; animation: flap-l 0.1s infinite ease-in-out; }
+        .wing-r { transform-origin: center left;  animation: flap-r 0.1s infinite ease-in-out; }
+        @keyframes flap-l { 0%,100%{transform:rotateY(0)} 50%{transform:rotateY(60deg)} }
+        @keyframes flap-r { 0%,100%{transform:rotateY(0)} 50%{transform:rotateY(-60deg)} }
+
+        /* ═══════════════════════════════════════════════════════
+           PAGE 2 — CHIP NEURAL / PONG
+        ═══════════════════════════════════════════════════════ */
+        #page2 { background: #010101; }
+        #canvas2 { position: absolute; inset: 0; }
+
+        .p2-ui {
+            position: absolute; inset: 0; z-index: 10;
+            display: flex; flex-direction: column;
+            align-items: center; pointer-events: none;
+            padding: 1rem;
+        }
+
+        .retro-panel {
+            background: rgba(0,15,10,0.92);
+            border: 1px solid var(--cyan);
+            pointer-events: auto;
+            box-shadow: 0 0 25px rgba(0,255,204,0.15);
+            backdrop-filter: blur(8px);
+        }
+        .main-header-p2 {
+            width: 95%; max-width: 780px;
+            padding: 0.7rem 1.2rem; margin-bottom: 0.5rem;
+        }
+        .sub-panels {
+            width: 95%; max-width: 780px;
+            display: flex; gap: 0.5rem;
+        }
+        .mini-panel {
+            flex: 1; padding: 0.5rem 1rem;
+            display: flex; flex-direction: column;
+        }
+
+        .scanlines {
+            position: absolute; inset: 0; z-index: 5; pointer-events: none;
+            background: repeating-linear-gradient(transparent, transparent 2px, rgba(0,0,0,0.3) 2px, rgba(0,0,0,0.3) 4px);
+        }
+
+        #audio-toggle-btn {
+            cursor: pointer; transition: all 0.25s;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        #audio-toggle-btn:hover { background: var(--cyan); color: #000; }
+
+        /* ═══════════════════════════════════════════════════════
+           PAGE 3 — DIALÉTICA DO ESCAFANDRO
+        ═══════════════════════════════════════════════════════ */
+        #page3 { background: #020202; }
+        #canvas3 { position: absolute; inset: 0; }
+
+        .noise-overlay {
+            position: absolute; inset: 0; z-index: 5; pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+            opacity: 0.07;
+        }
+        .crt-overlay {
+            position: absolute; inset: 0; z-index: 6; pointer-events: none;
+            background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.15) 50%);
+            background-size: 100% 3px;
+        }
+
+        .p3-ui {
+            position: absolute; inset: 0; z-index: 10;
+            pointer-events: none;
+            padding: 1.5rem 2rem;
+            display: flex; flex-direction: column;
+            justify-content: space-between;
+        }
+        .p3-header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+        }
+        .sat-cit {
+            font-family: 'Syncopate', sans-serif;
+            font-size: clamp(1rem, 3vw, 1.6rem);
+            color: var(--cyan); font-weight: 700; letter-spacing: -0.03em;
+        }
+        .p3-diag {
+            text-align: right;
+            border-right: 2px solid var(--red); padding-right: 0.8rem;
+        }
+        .diag-label {
+            font-size: 9px; color: #666; text-transform: uppercase;
+            font-weight: 700; display: block;
+        }
+        .diag-error {
+            font-size: 11px; color: var(--red); font-weight: 700;
+        }
+
+        .p3-center {
+            display: flex; justify-content: center; align-items: center;
+            flex-grow: 1; padding: 1rem 0;
+        }
+        #bug-info {
+            opacity: 0; transition: opacity 0.3s;
+            max-width: 380px; width: 100%;
+        }
+        .logic-card {
+            border-left: 5px solid var(--red);
+            background: rgba(12,0,0,0.98);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 0 60px rgba(0,0,0,1), 0 0 30px rgba(255,0,0,0.2);
+            padding: 2rem; pointer-events: auto;
+        }
+        .glitch-title {
+            color: var(--red); font-weight: 900;
+            font-size: 1.4rem; text-transform: uppercase;
+            letter-spacing: -0.03em; line-height: 1;
+            border-bottom: 1px solid rgba(255,0,0,0.3);
+            padding-bottom: 1rem; margin-bottom: 1rem;
+        }
+        .glitch-body { font-size: 10px; color: #ccc; line-height: 1.7; }
+        .grid-err {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .err-cell {
+            border: 1px solid rgba(255,0,0,0.4);
+            padding: 0.4rem 0.6rem; background: rgba(120,0,0,0.4);
+        }
+        .err-cell span:first-child {
+            font-size: 7px; color: #f87171; display: block;
+        }
+        .err-cell span:last-child {
+            font-size: 9px; color: #f87171; font-weight: 700;
+        }
+
+        .vector-label {
+            position: absolute; z-index: 60;
+            font-size: 9px; font-weight: 700; padding: 5px 10px;
+            background: rgba(0,20,30,0.95); border: 1px solid var(--cyan);
+            color: var(--cyan); pointer-events: none;
+            white-space: nowrap; text-transform: uppercase;
+            letter-spacing: 0.15em;
+            box-shadow: 0 0 12px rgba(0,255,255,0.25);
+            opacity: 0; transition: opacity 0.3s;
+            transform: translate(-50%, -50%);
+        }
+
+        .p3-trigger-area {
+            display: flex; justify-content: center; pointer-events: auto;
+            margin-bottom: 5rem;
+        }
+        #main-trigger-p3 {
+            width: 100%; max-width: 420px;
+            padding: 1.4rem; cursor: pointer;
+            border: 2px solid rgba(255,255,255,0.15);
+            background: rgba(0,0,0,0.6);
+            color: white; font-family: 'JetBrains Mono', monospace;
+            font-size: 9px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.4em;
+            transition: all 0.3s; position: relative; overflow: hidden;
+        }
+        #main-trigger-p3:hover {
+            border-color: var(--cyan);
+            box-shadow: 0 0 30px rgba(0,255,255,0.15);
+        }
+        .trigger-fill {
+            position: absolute; inset: 0;
+            background: rgba(0,255,255,0.08);
+            transform: translateX(-100%);
+            transition: transform 0.5s ease;
+        }
+        #main-trigger-p3:hover .trigger-fill { transform: translateX(0); }
+
+        .glitch-active .logic-card {
+            animation: frenzy 0.08s infinite;
+        }
+        @keyframes frenzy {
+            0%   { transform: translate(0,0); }
+            25%  { transform: translate(1px,-1px); }
+            50%  { transform: translate(-1px,1px); }
+            75%  { transform: translate(1.5px,0); }
+            100% { transform: translate(0,0); }
+        }
+        .glitch-active .glitch-title {
+            text-shadow: 1px 0 var(--red), -1px 0 var(--cyan);
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           PAGE 4 — YANTRA-HRIDAYA
+        ═══════════════════════════════════════════════════════ */
+        #page4 { background: #000; }
+        #canvas4 { position: absolute; inset: 0; }
+
+        .p4-ui {
+            position: absolute; inset: 0; z-index: 10;
+            pointer-events: none;
+            display: flex; flex-direction: column;
+            justify-content: space-between;
+            padding: 1rem 1.2rem;
+        }
+        .glass-panel {
+            pointer-events: auto;
+            background: rgba(0,0,0,0.92);
+            border: 1px solid rgba(255,204,51,0.3);
+            backdrop-filter: blur(15px);
+            padding: 1.2rem 1.5rem;
+            border-radius: 8px;
+            max-width: 480px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .gita-verse {
+            font-size: clamp(0.7rem, 2vw, 0.88rem);
+            color: var(--gold); text-align: center;
+            line-height: 1.6; font-family: serif; font-weight: 700;
+        }
+        .verse-tl {
+            font-size: 9px; color: #ccc; text-align: center;
+            display: block; line-height: 1.6; font-style: italic;
+            margin-top: 6px; max-width: 90%; margin-left: auto; margin-right: auto;
+        }
+        .yantra-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(1rem, 3.5vw, 1.3rem);
+            letter-spacing: 0.35em; color: var(--gold);
+            text-align: center; margin-top: 0.8rem;
+        }
+        .guna-subtitle {
+            font-size: 9px; color: var(--cyan); display: block;
+            text-align: center; font-weight: 700;
+            margin-top: 4px; letter-spacing: 0.3em; text-transform: uppercase;
+        }
+
+        .controls-panel {
+            pointer-events: auto;
+            background: rgba(0,0,0,0.92);
+            border: 1px solid rgba(255,204,51,0.3);
+            backdrop-filter: blur(15px);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            max-width: 480px;
+            margin: 0 auto;
+            width: 100%;
+            margin-bottom: 5rem;
+        }
+        .guna-labels {
+            display: flex; justify-content: space-between;
+            font-size: 9px; color: #444; font-weight: 700; margin-bottom: 8px;
+        }
+        .guna-lbl.active-guna { color: var(--cyan); text-shadow: 0 0 8px var(--cyan); }
+
+        input[type=range] {
+            width: 100%; height: 5px; -webkit-appearance: none;
+            background: rgba(255,255,255,0.1); outline: none;
+            border-radius: 10px; cursor: pointer;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 22px; height: 22px;
+            background: #000; border: 2px solid var(--cyan);
+            border-radius: 50%; cursor: pointer;
+            box-shadow: 0 0 12px var(--cyan);
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome to Atmai!</h1>
-    <p>This is the landing page for the Atmai project.</p>
+
+<!-- ═══════ GLOBAL AUDIO TOGGLE ═══════ -->
+<button id="global-audio-btn" title="Áudio">
+    <span class="audio-icon" id="audio-icon-svg">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+            <path id="icon-path" d="M2 4H4L7 1.5V10.5L4 8H2V4ZM8.5 3.5C9.5 4.5 9.5 7.5 8.5 8.5"/>
+        </svg>
+    </span>
+    <span id="audio-btn-label">SOM OFF</span>
+</button>
+
+<!-- ═══════ PAGE 1 ═══════ -->
+<div id="page1" class="page active">
+    <canvas id="canvas1"></canvas>
+
+    <div id="splash1">
+        <span style="font-size:8px;letter-spacing:0.6em;color:rgba(255,255,255,0.2);text-transform:uppercase;margin-bottom:2rem;">Capítulo I</span>
+        <svg class="fly-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path class="wing-l" d="M45 45C30 30 15 45 10 55C15 65 30 65 45 55" stroke="#00ffff" stroke-width="2"/>
+            <path class="wing-r" d="M55 45C70 30 85 45 90 55C85 65 70 65 55 55" stroke="#00ffff" stroke-width="2"/>
+            <ellipse cx="50" cy="55" rx="6" ry="12" fill="#00ffff"/>
+            <circle cx="50" cy="42" r="4" fill="#00ffff"/>
+        </svg>
+        <button class="nav-btn" id="splash1-btn" style="font-size:9px;letter-spacing:0.4em;padding:14px 40px;">Iniciar Sintonização</button>
+        <p style="font-size:7px;color:rgba(255,255,255,0.15);margin-top:1.5rem;letter-spacing:0.3em;text-transform:uppercase;font-style:italic;">Frequência de Prakriti</p>
+    </div>
+
+    <div class="p1-ui">
+        <header class="p1-header">
+            <span class="p1-chapter">Capítulo I · Conectoma de Prakriti</span>
+            <p class="p1-quote">"A alma espiritual julga-se a autora de atividades que, na verdade, são executadas pelos três modos da natureza material."</p>
+            <div class="guna-tags">
+                <span class="guna-tag sattva">SATTVA</span>
+                <span class="guna-tag rajas">RAJAS</span>
+                <span class="guna-tag tamas">TAMAS</span>
+            </div>
+            <span class="gita-ref">Bhagavad-Gita 3.27</span>
+        </header>
+
+        <div class="p1-bottom">
+            <div class="info-card">
+                <h3>Evidência Científica</h3>
+                <p>Através do escaneamento de 130 mil neurônios, a ciência digitalizou a "mente" de uma mosca. Ao ser transferido para ambiente virtual, o conectoma operou com autonomia biológica absoluta.</p>
+                <span class="ref-link">Princeton University / Nature 2024</span>
+            </div>
+            <div class="info-card" style="text-align:right;border-left:none;border-right:1px solid rgba(255,255,255,0.1);">
+                <h3>Conclusão Ontológica</h3>
+                <p>A arquitetura neural é a interface mecânica através da qual os Gunas operam. A "vontade" é o resultado da execução desse algoritmo material.</p>
+                <span class="ref-link">Ontologia AtmAI · Atma como Observadora</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-bar">
+        <div class="page-dots">
+            <div class="dot active" id="dot1-1"></div>
+            <div class="dot" id="dot1-2"></div>
+            <div class="dot" id="dot1-3"></div>
+            <div class="dot" id="dot1-4"></div>
+        </div>
+        <button class="nav-btn" id="p1-next" style="display:none;">Próximo →</button>
+    </div>
+</div>
+
+<!-- ═══════ PAGE 2 ═══════ -->
+<div id="page2" class="page">
+    <canvas id="canvas2"></canvas>
+    <div class="scanlines"></div>
+
+    <div class="p2-ui">
+        <div class="retro-panel main-header-p2">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <h1 style="font-size:clamp(8px,1.5vw,11px);font-weight:900;letter-spacing:0.2em;text-transform:uppercase;color:var(--cyan);font-family:'JetBrains Mono',monospace;">
+                    Tese: A NATUREZA (PRAKRITI) POSSUI PRÉ-PROGRAMAÇÃO REATIVA
+                </h1>
+                <button id="audio-toggle-btn" class="nav-btn" style="white-space:nowrap;margin-left:1rem;font-size:8px;">Ativar Áudio</button>
+            </div>
+            <p style="font-size:9px;color:rgba(200,255,245,0.9);line-height:1.6;">
+                <b style="color:white;text-transform:uppercase;">Análise:</b> Os neurônios conectados a chips aprenderam autonomamente o gameplay do Pong. Esta resposta neural natural a estímulos demonstra que a pré-programação não é código, mas a própria estrutura reativa da existência.
+                <span style="color:#f9a8d4;font-weight:700;font-size:8px;margin-left:4px;">[Ref: Cortical Labs / DishBrain, Melbourne, 2022]</span>
+            </p>
+        </div>
+        <div class="sub-panels">
+            <div class="retro-panel mini-panel">
+                <span style="font-size:7px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:4px;">Feedback de Recompensa</span>
+                <div id="score-p2" style="font-size:clamp(1rem,3vw,1.5rem);color:white;font-family:'JetBrains Mono',monospace;">IA: 0 | P2: 0</div>
+            </div>
+            <div class="retro-panel mini-panel" style="text-align:right;">
+                <span style="font-size:7px;color:var(--gold);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:4px;">Atividade Sináptica</span>
+                <div id="neural-status" style="font-size:9px;color:#666;text-transform:uppercase;font-style:italic;">Aguardando Estímulo...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-bar">
+        <div class="page-dots">
+            <div class="dot" id="dot2-1"></div>
+            <div class="dot active" id="dot2-2"></div>
+            <div class="dot" id="dot2-3"></div>
+            <div class="dot" id="dot2-4"></div>
+        </div>
+        <button class="nav-btn" id="p2-prev">← Voltar</button>
+        <button class="nav-btn" id="p2-next">Próximo →</button>
+    </div>
+</div>
+
+<!-- ═══════ PAGE 3 ═══════ -->
+<div id="page3" class="page">
+    <canvas id="canvas3"></canvas>
+    <div class="noise-overlay"></div>
+    <div class="crt-overlay"></div>
+
+    <!-- vector labels -->
+    <div class="vector-label" id="v-sat" style="left:22%;top:22%;">SAT → MANUTENÇÃO FÍSICA</div>
+    <div class="vector-label" id="v-cit" style="left:78%;top:38%;">CIT → ACÚMULO DE DADOS</div>
+    <div class="vector-label" id="v-ananda" style="left:28%;top:78%;">ANANDA → ESTIMULAÇÃO SENSORIAL</div>
+
+    <div class="p3-ui">
+        <header class="p3-header">
+            <div>
+                <p class="sat-cit">SAT · CIT · ANANDA</p>
+                <p style="font-size:8px;color:rgba(0,255,255,0.5);font-weight:700;text-transform:uppercase;letter-spacing:0.3em;margin-top:3px;">Qualidades Constitucionais da Alma</p>
+            </div>
+            <div class="p3-diag">
+                <span class="diag-label">Diagnóstico Ontológico</span>
+                <span class="diag-error">ERRO DE TRANSDUÇÃO</span>
+            </div>
+        </header>
+
+        <div class="p3-center">
+            <div id="bug-info">
+                <div class="logic-card">
+                    <h2 class="glitch-title">!! FRUSTRAÇÃO ONTOLÓGICA !!</h2>
+                    <div class="glitch-body">
+                        <p style="margin-bottom:0.8rem;">
+                            <b style="color:white;border-bottom:1px solid rgba(255,255,255,0.2);">DILUIÇÃO DA ESSÊNCIA:</b><br>
+                            O Escafandro (corpo) tenta capturar o infinito através de ferramentas finitas.
+                        </p>
+                        <p style="color:#888;font-style:italic;">O resultado é um atrito existencial: o som do "bug" na realidade material.</p>
+                        <div class="grid-err">
+                            <div class="err-cell"><span>SAT REAL</span><span>TEMPO</span></div>
+                            <div class="err-cell"><span>CIT REAL</span><span>MÍDIA</span></div>
+                            <div class="err-cell"><span>ANANDA REAL</span><span>CONSUMO</span></div>
+                            <div class="err-cell"><span>FONTE</span><span>OBJETO</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="p3-trigger-area">
+            <button id="main-trigger-p3">
+                <div class="trigger-fill"></div>
+                <span style="position:relative;z-index:1;">Processar Vetores Materialistas</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="nav-bar">
+        <div class="page-dots">
+            <div class="dot" id="dot3-1"></div>
+            <div class="dot" id="dot3-2"></div>
+            <div class="dot active" id="dot3-3"></div>
+            <div class="dot" id="dot3-4"></div>
+        </div>
+        <button class="nav-btn" id="p3-prev">← Voltar</button>
+        <button class="nav-btn" id="p3-next">Próximo →</button>
+    </div>
+</div>
+
+<!-- ═══════ PAGE 4 ═══════ -->
+<div id="page4" class="page">
+    <canvas id="canvas4"></canvas>
+
+    <div class="p4-ui">
+        <div class="glass-panel">
+            <div class="gita-verse">
+                ईश्वरः सर्वभूतानां हृद्देशेऽर्जुन तिष्ठति ।<br>
+                भ्रामयन्सर्वभूतानि यन्त्रारूढानि मायया ॥
+            </div>
+            <span class="verse-tl">"O Senhor Supremo reside no coração de todos, dirigindo as andanças de todos os seres, que estão sentados numa máquina feita de energia material."</span>
+            <h1 class="yantra-title">YANTRA-HRIDAYA</h1>
+            <span id="guna-title-p4" class="guna-subtitle">VIXUDDHA-SATTVA</span>
+        </div>
+
+        <div class="controls-panel">
+            <div class="guna-labels">
+                <span class="guna-lbl active-guna" id="g4-0">V. SATTVA</span>
+                <span class="guna-lbl" id="g4-1">SATTVA</span>
+                <span class="guna-lbl" id="g4-2">RAJAS</span>
+                <span class="guna-lbl" id="g4-3">TAMAS</span>
+            </div>
+            <input type="range" id="speed4" min="0" max="3" step="0.001" value="0">
+        </div>
+    </div>
+
+    <div class="nav-bar">
+        <div class="page-dots">
+            <div class="dot" id="dot4-1"></div>
+            <div class="dot" id="dot4-2"></div>
+            <div class="dot" id="dot4-3"></div>
+            <div class="dot active" id="dot4-4"></div>
+        </div>
+        <button class="nav-btn" id="p4-prev">← Voltar</button>
+        <button class="nav-btn gold" id="p4-home">↺ Início</button>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SCRIPTS
+════════════════════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════════════
+// GLOBAL STATE
+// ═══════════════════════════════════════════════════════════════
+let currentPage = 1;
+let globalAudioOn = true;
+
+// One shared AudioContext for everything — avoids cross-context issues
+let AC = null;
+function getAC() {
+    if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+    if (AC.state === 'suspended') AC.resume();
+    return AC;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GLOBAL MASTER GAIN — all audio passes through this
+// ═══════════════════════════════════════════════════════════════
+let masterOut = null; // created on first getAC() call
+
+function getMaster() {
+    if (!masterOut) {
+        const ac = getAC();
+        masterOut = ac.createGain();
+        masterOut.gain.value = 1; // starts on
+        masterOut.connect(ac.destination);
+    }
+    return masterOut;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PAGE MANAGER
+// ═══════════════════════════════════════════════════════════════
+function goTo(n) {
+    const prev = currentPage;
+
+    // Silence page-specific audio layers when leaving
+    if (prev === 1) p1Silence();
+    if (prev === 2) p2Silence();
+    if (prev === 3) p3Silence();
+    if (prev === 4) p4Silence();
+
+    document.getElementById('page' + prev).classList.remove('active');
+    document.getElementById('page' + n).classList.add('active');
+    currentPage = n;
+
+    if (n === 1 && !p1Init) initPage1();
+    if (n === 2 && !p2Init) initPage2();
+    if (n === 3 && !p3Init) initPage3();
+    if (n === 4 && !p4Init) initPage4();
+
+    // Re-activate page audio if global sound is on
+    if (n === 4 && globalAudioOn) p4SetGains();
+}
+
+document.getElementById('p1-next').addEventListener('click', () => goTo(2));
+document.getElementById('p2-prev').addEventListener('click', () => goTo(1));
+document.getElementById('p2-next').addEventListener('click', () => goTo(3));
+document.getElementById('p3-prev').addEventListener('click', () => goTo(2));
+document.getElementById('p3-next').addEventListener('click', () => goTo(4));
+document.getElementById('p4-prev').addEventListener('click', () => goTo(3));
+document.getElementById('p4-home').addEventListener('click', () => goTo(1));
+
+// ═══════════════════════════════════════════════════════════════
+// GLOBAL AUDIO BUTTON
+// ═══════════════════════════════════════════════════════════════
+const globalBtn      = document.getElementById('global-audio-btn');
+const globalBtnLabel = document.getElementById('audio-btn-label');
+
+function setGlobalAudio(on) {
+    globalAudioOn = on;
+    globalBtn.classList.toggle('audio-on', on);
+    globalBtnLabel.textContent = on ? 'SOM ON' : 'SOM OFF';
+
+    const m = getMaster();
+    m.gain.setTargetAtTime(on ? 1.0 : 0, getAC().currentTime, 0.3);
+
+    // Sync page-4 layer gains so they're audible immediately
+    if (on && currentPage === 4) p4SetGains();
+}
+
+globalBtn.addEventListener('click', () => setGlobalAudio(!globalAudioOn));
+
+// Set button to ON state visually on load (audio is on by default)
+window.addEventListener('DOMContentLoaded', () => {
+    globalBtn.classList.add('audio-on');
+    globalBtnLabel.textContent = 'SOM ON';
+});
+
+// ═══════════════════════════════════════════════════════════════
+// PAGE 1 — MOSCA / CONECTOMA
+// ═══════════════════════════════════════════════════════════════
+let p1Init = false;
+let p1Renderer, p1Scene, p1Camera, p1FlyGroup;
+let p1MouseX = 0, p1MouseY = 0;
+let p1Frenzied = false, p1Started = false, p1ReactionTO;
+let p1BuzzOsc, p1BuzzGain;
+
+function initPage1() {
+    p1Init = true;
+    const canvas = document.getElementById('canvas1');
+    p1Renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    p1Renderer.setSize(innerWidth, innerHeight);
+    p1Renderer.setPixelRatio(devicePixelRatio);
+    p1Scene  = new THREE.Scene();
+    p1Camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 1000);
+    p1Camera.position.z = 6;
+    p1FlyGroup = new THREE.Group();
+    p1Scene.add(p1FlyGroup);
+    buildFly();
+    p1Animate();
+
+    window.addEventListener('mousemove', e => {
+        if (currentPage !== 1) return;
+        p1MouseX = (e.clientX - innerWidth/2) / 200;
+        p1MouseY = (e.clientY - innerHeight/2) / 200;
+    });
+    document.addEventListener('mousedown',   () => { if (p1Started && currentPage === 1) p1React(800); });
+    document.addEventListener('touchstart',  () => { if (p1Started && currentPage === 1) p1React(800); }, { passive: true });
+}
+
+function p1BuildBuzz() {
+    if (p1BuzzOsc) return; // already built
+    const ac = getAC();
+    p1BuzzOsc  = ac.createOscillator(); p1BuzzOsc.type = 'sawtooth'; p1BuzzOsc.frequency.value = 280;
+    p1BuzzGain = ac.createGain(); p1BuzzGain.gain.value = 0;
+    p1BuzzOsc.connect(p1BuzzGain);
+    p1BuzzGain.connect(getMaster());
+    p1BuzzOsc.start();
+}
+
+function p1React(dur = 500) {
+    // Visual frenzy — always
+    p1Frenzied = true;
+    clearTimeout(p1ReactionTO);
+    p1ReactionTO = setTimeout(() => { p1Frenzied = false; }, dur);
+
+    // Audio — only if global sound is on
+    if (!globalAudioOn) return;
+    p1BuildBuzz();
+    const ac = getAC();
+    p1BuzzOsc.frequency.setTargetAtTime(320 + Math.random()*200, ac.currentTime, 0.05);
+    p1BuzzGain.gain.setTargetAtTime(0.9, ac.currentTime, 0.01);
+    clearTimeout(p1ReactionTO);
+    p1ReactionTO = setTimeout(() => {
+        p1Frenzied = false;
+        p1BuzzGain.gain.setTargetAtTime(0, ac.currentTime, 0.08);
+    }, dur);
+}
+
+function p1Silence() {
+    if (p1BuzzGain) p1BuzzGain.gain.setTargetAtTime(0, getAC().currentTime, 0.1);
+}
+
+function buildFly() {
+    const matHead  = new THREE.PointsMaterial({ color: 0xa855f7, size: 0.022, transparent: true, opacity: 0.85 });
+    const matEye   = new THREE.PointsMaterial({ color: 0x00ffff, size: 0.016, transparent: true, opacity: 0.95 });
+    const matRajas = new THREE.PointsMaterial({ color: 0xff4444, size: 0.022, transparent: true, opacity: 0.6 });
+    const matTamas = new THREE.PointsMaterial({ color: 0x888888, size: 0.022, transparent: true, opacity: 0.6 });
+    const matWing  = new THREE.PointsMaterial({ color: 0xccffff, size: 0.022, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending });
+
+    const headG = new THREE.SphereGeometry(0.5, 32, 32); headG.scale(1.1, 0.9, 0.8);
+    p1FlyGroup.add(new THREE.Points(headG, matHead));
+    const eyeG = new THREE.SphereGeometry(0.4, 20, 20);
+    const eyeL = new THREE.Points(eyeG, matEye); eyeL.position.set(-0.4, 0.1, 0.2);
+    const eyeR = eyeL.clone(); eyeR.position.x = 0.4;
+    p1FlyGroup.add(eyeL, eyeR);
+    const thoraxG = new THREE.SphereGeometry(0.75, 32, 32);
+    const thorax = new THREE.Points(thoraxG, matRajas); thorax.position.z = -0.7;
+    p1FlyGroup.add(thorax);
+    const abdG = new THREE.SphereGeometry(0.85, 32, 32); abdG.scale(0.8, 0.7, 1.4);
+    const abd = new THREE.Points(abdG, matTamas); abd.position.set(0, -0.2, -1.8);
+    p1FlyGroup.add(abd);
+    const legPts = [];
+    for (let i = 0; i < 6; i++) {
+        const side = i < 3 ? 1 : -1, row = i % 3, zPos = -0.6 - row*0.4;
+        for (let j = 0; j < 10; j++) {
+            const t = j/10;
+            legPts.push(new THREE.Vector3(side*(0.5+t*0.6), -t*0.7, zPos));
+        }
+    }
+    p1FlyGroup.add(new THREE.Points(new THREE.BufferGeometry().setFromPoints(legPts), matRajas));
+    const mkWing = side => {
+        const pts = [];
+        for (let i = 0; i < 1500; i++) {
+            const r = Math.sqrt(Math.random()), θ = (Math.random()-0.5)*Math.PI*1.3;
+            pts.push(new THREE.Vector3(side*r*Math.cos(θ)*2.5, r*Math.sin(θ)*1.5, (Math.random()-0.5)*0.05));
+        }
+        const wc = new THREE.Group();
+        const wp = new THREE.Points(new THREE.BufferGeometry().setFromPoints(pts), matWing);
+        wp.position.set(side*0.5, 0.2, 0);
+        wc.add(wp); wc.userData.side = side;
+        wc.position.set(side*0.1, 0.4, -0.8);
+        return wc;
+    };
+    p1FlyGroup.add(mkWing(-1), mkWing(1));
+}
+
+function p1Animate() {
+    requestAnimationFrame(p1Animate);
+    if (currentPage !== 1) return;
+    const t = Date.now()*0.001;
+    if (p1Started) {
+        if (p1Frenzied) {
+            p1FlyGroup.position.x = (Math.random()-0.5)*0.15;
+            p1FlyGroup.position.y = (Math.random()-0.5)*0.15;
+            p1FlyGroup.position.z = (Math.random()-0.5)*0.15;
+        } else {
+            p1FlyGroup.position.lerp(new THREE.Vector3(0, Math.sin(t*2)*0.1, 0), 0.05);
+            p1FlyGroup.rotation.y += (p1MouseX - p1FlyGroup.rotation.y)*0.05;
+            p1FlyGroup.rotation.x += (p1MouseY - p1FlyGroup.rotation.x)*0.05;
+        }
+        p1FlyGroup.children.forEach(c => {
+            if (c.userData && c.userData.side) {
+                if (p1Frenzied) {
+                    c.rotation.z = Math.sin(Date.now()*0.06)*1.2*c.userData.side;
+                    c.rotation.y = Math.cos(Date.now()*0.06)*0.5;
+                } else {
+                    c.rotation.z = THREE.MathUtils.lerp(c.rotation.z, 0.15*c.userData.side, 0.1);
+                    c.rotation.y = THREE.MathUtils.lerp(c.rotation.y, 0.45*c.userData.side, 0.1);
+                }
+            }
+        });
+    } else {
+        p1FlyGroup.rotation.y += 0.01;
+    }
+    p1Renderer.render(p1Scene, p1Camera);
+}
+
+document.getElementById('splash1-btn').addEventListener('click', () => {
+    p1Started = true;
+    const splash = document.getElementById('splash1');
+    splash.style.opacity = '0';
+    setTimeout(() => {
+        splash.style.display = 'none';
+        document.getElementById('p1-next').style.display = 'block';
+        p1BuildBuzz();
+        const rand = () => {
+            if (!p1Started || currentPage !== 1) return;
+            if (Math.random() > 0.75) p1React(300 + Math.random()*700);
+            setTimeout(rand, 1000 + Math.random()*3000);
+        };
+        rand();
+    }, 1200);
+});
+
+window.addEventListener('resize', () => {
+    if (p1Renderer) {
+        p1Renderer.setSize(innerWidth, innerHeight);
+        p1Camera.aspect = innerWidth/innerHeight;
+        p1Camera.updateProjectionMatrix();
+    }
+});
+window.addEventListener('load', initPage1);
+
+// ═══════════════════════════════════════════════════════════════
+// PAGE 2 — CHIP NEURAL / PONG
+// ═══════════════════════════════════════════════════════════════
+let p2Init = false;
+let p2Renderer, p2Scene, p2Camera;
+let p2Ball, p2PlayerPaddle, p2AiPaddle, p2Chip, p2Monitor, p2Neuron, p2Umbilical;
+let p2BallVel = { x: 0.12, y: 0.12 };
+let p2Scores = { ai: 0, player: 0 };
+let p2TargetY = 0, p2AiOffset = 0;
+let p2HumGain;
+
+function initPage2() {
+    p2Init = true;
+    const canvas = document.getElementById('canvas2');
+    p2Renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    p2Renderer.setSize(innerWidth, innerHeight);
+    p2Renderer.setPixelRatio(devicePixelRatio);
+    p2Scene = new THREE.Scene();
+    p2Scene.background = new THREE.Color(0x010101);
+    p2Scene.fog = new THREE.Fog(0x010101, 10, 70);
+    p2Camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 1, 1000);
+    p2Scene.add(new THREE.AmbientLight(0xffffff, 0.2));
+    const kl = new THREE.PointLight(0xffffff, 1.2, 100); kl.position.set(15,25,20); p2Scene.add(kl);
+    const gl = new THREE.PointLight(0xff00ff, 1.5, 20); gl.position.set(5,-5,10); p2Scene.add(gl);
+
+    p2Monitor = new THREE.Group();
+    p2Monitor.add(new THREE.Mesh(new THREE.BoxGeometry(16,12,10), new THREE.MeshPhongMaterial({ color: 0xdbccae })));
+    const frame = new THREE.Mesh(new THREE.BoxGeometry(15.4,11.4,1.5), new THREE.MeshPhongMaterial({ color: 0xc4b491 }));
+    frame.position.z = 4.8; p2Monitor.add(frame);
+    const screen = new THREE.Mesh(new THREE.PlaneGeometry(13.8,9.8), new THREE.MeshBasicMaterial({ color: 0x001a05 }));
+    screen.position.z = 5.56; p2Monitor.add(screen);
+    p2Scene.add(p2Monitor);
+
+    p2Chip = new THREE.Group();
+    p2Chip.add(new THREE.Mesh(new THREE.BoxGeometry(8,0.4,8), new THREE.MeshPhongMaterial({ color: 0x061a06 })));
+    const trkMat = new THREE.MeshBasicMaterial({ color: 0x00ffaa, transparent: true, opacity: 0.4 });
+    for (let i = 0; i < 20; i++) {
+        const tr = new THREE.Mesh(new THREE.PlaneGeometry(Math.random()*6+1, Math.random()*0.12+0.04), trkMat);
+        tr.rotation.x = -Math.PI/2; tr.position.set((Math.random()-0.5)*7.5, 0.21, (Math.random()-0.5)*7.5);
+        tr.rotation.z = Math.random() > 0.5 ? 0 : Math.PI/2; p2Chip.add(tr);
+    }
+    const neuronG = new THREE.Group();
+    p2Neuron = new THREE.Mesh(new THREE.SphereGeometry(1.2,32,32), new THREE.MeshPhongMaterial({ color: 0xff00ff, emissive: 0x440044, transparent: true, opacity: 0.85 }));
+    neuronG.add(p2Neuron); neuronG.position.y = 1.8; p2Chip.add(neuronG);
+    p2Scene.add(p2Chip);
+
+    const pG = new THREE.BoxGeometry(0.35,2.2,0.1);
+    p2PlayerPaddle = new THREE.Mesh(pG, new THREE.MeshBasicMaterial({ color: 0x00ffcc }));
+    p2PlayerPaddle.position.set(-6,0,5.65); p2Scene.add(p2PlayerPaddle);
+    p2AiPaddle = new THREE.Mesh(pG, new THREE.MeshBasicMaterial({ color: 0xff00cc }));
+    p2AiPaddle.position.set(6,0,5.65); p2Scene.add(p2AiPaddle);
+    p2Ball = new THREE.Mesh(new THREE.SphereGeometry(0.18,16,16), new THREE.MeshBasicMaterial({ color: 0xeeff00 }));
+    p2Ball.position.z = 5.65; p2Scene.add(p2Ball);
+
+    p2UpdateLayout();
+    window.addEventListener('mousemove', e => { if (currentPage===2) p2TargetY = -(e.clientY/innerHeight)*11+5.5; });
+    window.addEventListener('touchmove', e => { if (currentPage===2 && e.touches[0]) p2TargetY = -(e.touches[0].clientY/innerHeight)*11+5.5; }, { passive: true });
+    document.getElementById('audio-toggle-btn').addEventListener('click', p2InitHum);
+    p2Animate();
+}
+
+function p2InitHum() {
+    if (p2HumGain) return;
+    const ac = getAC();
+    const o = ac.createOscillator(); o.type = 'sine'; o.frequency.value = 50;
+    p2HumGain = ac.createGain(); p2HumGain.gain.value = 0;
+    o.connect(p2HumGain); p2HumGain.connect(getMaster()); o.start();
+    // activate global audio automatically when user clicks this button
+    setGlobalAudio(true);
+    p2HumGain.gain.setTargetAtTime(0.04, ac.currentTime, 0.3);
+    const btn = document.getElementById('audio-toggle-btn');
+    btn.textContent = 'Áudio Ativo'; btn.style.color = '#ff00ff'; btn.style.borderColor = '#ff00ff';
+}
+
+function p2Silence() {
+    if (p2HumGain) p2HumGain.gain.setTargetAtTime(0, getAC().currentTime, 0.2);
+}
+
+function p2PlayHit(freq) {
+    if (!globalAudioOn) return;
+    const ac = getAC();
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = 'square'; o.frequency.value = freq;
+    o.frequency.exponentialRampToValueAtTime(freq/2, ac.currentTime+0.1);
+    g.gain.value = 0.9; g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime+0.1);
+    o.connect(g); g.connect(getMaster()); o.start(); o.stop(ac.currentTime+0.1);
+}
+
+function p2CreateCable() {
+    if (p2Umbilical) p2Scene.remove(p2Umbilical);
+    const aspect = innerWidth/innerHeight;
+    const start = new THREE.Vector3(0,-5,0);
+    const end = aspect < 1 ? new THREE.Vector3(0,-13,6) : new THREE.Vector3(12,-7,4);
+    const mid = new THREE.Vector3((start.x+end.x)/2,-10,(start.z+end.z)/2+2);
+    const curve = new THREE.CatmullRomCurve3([start, mid, end]);
+    p2Umbilical = new THREE.Mesh(new THREE.TubeGeometry(curve,40,0.45,12,false), new THREE.MeshPhongMaterial({ color: 0x151515 }));
+    p2Scene.add(p2Umbilical);
+}
+
+function p2UpdateLayout() {
+    const aspect = innerWidth/innerHeight;
+    if (aspect < 1) {
+        p2Camera.position.set(0,20,36); p2Monitor.position.set(0,5,0);
+        p2Chip.position.set(0,-15,6); p2Chip.rotation.y = 0;
+    } else {
+        p2Camera.position.set(0,6,28); p2Monitor.position.set(-8,-1,0);
+        p2Chip.position.set(13,-9,4); p2Chip.rotation.y = -Math.PI/4;
+    }
+    p2Camera.aspect = innerWidth/innerHeight; p2Camera.updateProjectionMatrix();
+    p2Camera.lookAt(0,0,0); p2CreateCable();
+}
+
+function p2Physics() {
+    p2PlayerPaddle.position.y += (p2TargetY - p2PlayerPaddle.position.y)*0.25;
+    p2PlayerPaddle.position.y = Math.max(-4, Math.min(4, p2PlayerPaddle.position.y));
+    if (Math.abs(p2Ball.position.x - p2AiPaddle.position.x) < 8)
+        p2AiPaddle.position.y += (p2Ball.position.y + p2AiOffset - p2AiPaddle.position.y)*0.065;
+    p2AiPaddle.position.y = Math.max(-4, Math.min(4, p2AiPaddle.position.y));
+    p2Ball.position.x += p2BallVel.x; p2Ball.position.y += p2BallVel.y;
+    if (Math.abs(p2Ball.position.y) > 4.6) { p2BallVel.y *= -1; p2PlayHit(200); }
+    if (Math.abs(p2Ball.position.x) > 5.7) {
+        const paddle = p2Ball.position.x < 0 ? p2PlayerPaddle : p2AiPaddle;
+        const hitRange = p2Ball.position.x < 0 ? 1.5 : 1.3;
+        if (Math.abs(p2Ball.position.y - paddle.position.y) < hitRange) {
+            p2BallVel.x *= -1.025;
+            if (Math.abs(p2BallVel.x) > 0.30) p2BallVel.x = Math.sign(p2BallVel.x)*0.30;
+            p2PlayHit(p2Ball.position.x < 0 ? 440 : 660);
+            p2Neuron.scale.set(1.8,1.8,1.8);
+            p2Neuron.material.color.set(p2Ball.position.x < 0 ? 0x00ffcc : 0xff00cc);
+            document.getElementById('neural-status').textContent = 'REFLEXO NEURAL';
+            setTimeout(() => document.getElementById('neural-status').textContent = 'Processando...', 600);
+            p2AiOffset = (Math.random()-0.5)*1.8;
+        }
+    }
+    if (Math.abs(p2Ball.position.x) > 8) {
+        if (p2Ball.position.x > 0) p2Scores.player++; else p2Scores.ai++;
+        p2Ball.position.set(0,0,5.65);
+        p2BallVel.x = Math.random()>0.5 ? 0.12 : -0.12;
+        p2BallVel.y = Math.random()>0.5 ? 0.12 : -0.12;
+        p2AiOffset = 0;
+        document.getElementById('score-p2').textContent = `IA: ${p2Scores.ai} | P2: ${p2Scores.player}`;
+    }
+}
+
+function p2Animate() {
+    requestAnimationFrame(p2Animate);
+    if (currentPage !== 2) return;
+    p2Physics();
+    const t = Date.now()*0.002;
+    if (p2Neuron) {
+        p2Neuron.scale.lerp(new THREE.Vector3(1,1,1), 0.1);
+        p2Neuron.material.color.lerp(new THREE.Color(0xff00ff), 0.05);
+        p2Neuron.parent.position.y = 1.8 + Math.sin(t)*0.25;
+        p2Neuron.rotation.y += 0.01;
+    }
+    p2Renderer.render(p2Scene, p2Camera);
+}
+
+window.addEventListener('resize', () => {
+    if (p2Renderer) { p2Renderer.setSize(innerWidth, innerHeight); p2UpdateLayout(); }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// PAGE 3 — DIALÉTICA DO ESCAFANDRO
+// ═══════════════════════════════════════════════════════════════
+let p3Init = false;
+let p3Renderer, p3Scene, p3Camera, p3Soul, p3Astronaut, p3Barrier, p3Vectors = [];
+let p3Processing = false;
+let p3BugGain, p3BugOsc, p3BugOsc2;
+let p3Clock;
+
+function initPage3() {
+    p3Init = true;
+    p3Clock = new THREE.Clock();
+    const canvas = document.getElementById('canvas3');
+    p3Renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    p3Renderer.setSize(innerWidth, innerHeight);
+    p3Renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    p3Scene = new THREE.Scene();
+    p3Camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 1000);
+    p3Camera.position.set(0,2,12);
+    p3Scene.add(new THREE.AmbientLight(0xffffff, 0.1));
+    const spot = new THREE.PointLight(0x00ffff, 2, 20); spot.position.set(5,5,5); p3Scene.add(spot);
+
+    const starGeo = new THREE.BufferGeometry();
+    const sPos = [];
+    for (let i = 0; i < 3000; i++) sPos.push((Math.random()-0.5)*100, (Math.random()-0.5)*100, (Math.random()-0.5)*100);
+    starGeo.setAttribute('position', new THREE.Float32BufferAttribute(sPos, 3));
+    p3Scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0x444444, size: 0.05 })));
+
+    p3Soul = new THREE.Mesh(new THREE.IcosahedronGeometry(1.5,4), new THREE.MeshStandardMaterial({ color: 0x00ffff, emissive: 0x00ffff, emissiveIntensity: 2, wireframe: true }));
+    p3Soul.position.y = 7; p3Scene.add(p3Soul);
+
+    const suitGroup = new THREE.Group();
+    const ironMat = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.8, metalness: 0.2 });
+    suitGroup.add(new THREE.Mesh(new THREE.BoxGeometry(2,2.5,1), ironMat));
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.8,24,24), ironMat); head.position.y = 1.8; suitGroup.add(head);
+    const visor = new THREE.Mesh(new THREE.SphereGeometry(0.65,24,12,0,Math.PI*2,0,Math.PI/2), new THREE.MeshStandardMaterial({ color: 0x000000 }));
+    visor.rotation.x = Math.PI/2; visor.position.set(0,1.8,0.4); suitGroup.add(visor);
+    p3Astronaut = suitGroup; p3Astronaut.position.y = -3; p3Scene.add(p3Astronaut);
+
+    p3Barrier = new THREE.Mesh(new THREE.PlaneGeometry(20,20), new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.05, wireframe: true, side: THREE.DoubleSide }));
+    p3Barrier.rotation.x = Math.PI/2; p3Barrier.position.y = 2.5; p3Scene.add(p3Barrier);
+
+    for (let i = 0; i < 3; i++) {
+        const geo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,7,0), new THREE.Vector3(0,-3,0)]);
+        const line = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.2 }));
+        p3Vectors.push(line); p3Scene.add(line);
+    }
+
+    // Build chaos audio nodes (silent until button held)
+    p3BuildChaos();
+
+    const trigger = document.getElementById('main-trigger-p3');
+    const bugInfo = document.getElementById('bug-info');
+    const vLabels = ['v-sat','v-cit','v-ananda'].map(id => document.getElementById(id));
+
+    trigger.addEventListener('pointerdown', e => {
+        if (e.cancelable) e.preventDefault();
+        p3Processing = true;
+        bugInfo.style.opacity = '1';
+        document.getElementById('page3').classList.add('glitch-active');
+        vLabels.forEach(l => l.style.opacity = '1');
+        if (globalAudioOn) {
+            const ac = getAC();
+            p3BugGain.gain.setTargetAtTime(0.6, ac.currentTime, 0.03);
+        }
+    });
+    window.addEventListener('pointerup', () => {
+        p3Processing = false;
+        bugInfo.style.opacity = '0';
+        document.getElementById('page3').classList.remove('glitch-active');
+        vLabels.forEach(l => l.style.opacity = '0');
+        p3BugGain.gain.setTargetAtTime(0, getAC().currentTime, 0.12);
+    });
+
+    p3Animate();
+}
+
+function p3BuildChaos() {
+    if (p3BugGain) return;
+    const ac = getAC();
+    // Distortion waveshaper
+    const dist = ac.createWaveShaper();
+    const curve = new Float32Array(256);
+    for (let i = 0; i < 256; i++) { const x = i*2/256-1; curve[i] = (Math.PI+200)*x/(Math.PI+200*Math.abs(x)); }
+    dist.curve = curve;
+    // Bandpass filter
+    const filt = ac.createBiquadFilter(); filt.type = 'bandpass'; filt.frequency.value = 900; filt.Q.value = 3;
+    // Two oscillators
+    p3BugOsc  = ac.createOscillator(); p3BugOsc.type  = 'sawtooth'; p3BugOsc.frequency.value = 60;
+    p3BugOsc2 = ac.createOscillator(); p3BugOsc2.type = 'square';   p3BugOsc2.frequency.value = 80;
+    p3BugOsc.connect(dist); p3BugOsc2.connect(dist);
+    dist.connect(filt);
+    p3BugGain = ac.createGain(); p3BugGain.gain.value = 0;
+    filt.connect(p3BugGain); p3BugGain.connect(getMaster());
+    p3BugOsc.start(); p3BugOsc2.start();
+}
+
+function p3Silence() {
+    if (p3BugGain) p3BugGain.gain.setTargetAtTime(0, getAC().currentTime, 0.1);
+}
+
+function p3Animate() {
+    requestAnimationFrame(p3Animate);
+    if (currentPage !== 3) return;
+    const t = p3Clock.getElapsedTime();
+    p3Soul.rotation.y += 0.02;
+    p3Astronaut.position.y = -3 + Math.sin(t*0.5)*0.3;
+
+    p3Vectors.forEach((v, i) => {
+        const pos = v.geometry.attributes.position.array;
+        pos[0] = Math.sin(t+i)*0.3; pos[1] = 7;
+        pos[3] = (i-1)*2 + (p3Processing ? Math.sin(t*60)*0.1 : 0);
+        pos[4] = p3Processing ? -3 : 2.5;
+        v.geometry.attributes.position.needsUpdate = true;
+        v.material.opacity = p3Processing ? 0.8 : 0.2;
+        v.material.color.setHex(p3Processing ? 0xff0000 : 0x00ffff);
+    });
+
+    if (p3Processing) {
+        p3Camera.position.z = 12 + Math.sin(t*40)*0.04;
+        p3Barrier.material.opacity = 0.1 + Math.sin(t*15)*0.05;
+        if (globalAudioOn && p3BugOsc) {
+            p3BugOsc.frequency.setValueAtTime(30 + Math.random()*400, getAC().currentTime);
+            p3BugOsc2.frequency.setValueAtTime(50 + Math.random()*600, getAC().currentTime);
+        }
+    }
+    p3Renderer.render(p3Scene, p3Camera);
+}
+
+window.addEventListener('resize', () => {
+    if (p3Renderer) { p3Renderer.setSize(innerWidth, innerHeight); p3Camera.aspect = innerWidth/innerHeight; p3Camera.updateProjectionMatrix(); }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// PAGE 4 — YANTRA-HRIDAYA
+// ═══════════════════════════════════════════════════════════════
+let p4Init = false;
+let p4Renderer, p4Scene, p4Camera, p4MachineGroup;
+let p4Gears = [], p4Paramatma, p4Atma, p4Particles, p4Silhouette;
+let p4CurrentSpeed = 0, p4TargetRotY = 0, p4UserInteracting = false;
+
+// Audio layer gains — always live, master controls volume
+let p4GainVsat, p4GainSat, p4GainRaj, p4GainTam;
+let p4RajStep = 0;
+const p4RajPattern = [1,0,1,0,1,1,0,1];
+
+const p4GunaColors = [
+    new THREE.Color(0x00ffff), new THREE.Color(0xffcc33),
+    new THREE.Color(0xaa3300), new THREE.Color(0x221144)
+];
+const p4Titles = ['Vixuddha-Sattva','Sattva-Guna','Raja-Guna','Tama-Guna'];
+
+function initPage4() {
+    p4Init = true;
+    const canvas = document.getElementById('canvas4');
+    p4Renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    p4Renderer.setSize(innerWidth, innerHeight);
+    p4Renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    p4Renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    p4Renderer.toneMappingExposure = 1.8;
+
+    p4Scene = new THREE.Scene();
+    p4Camera = new THREE.PerspectiveCamera(42, innerWidth/innerHeight, 0.1, 1000);
+    p4Camera.position.set(0, 0.5, 22);
+    p4MachineGroup = new THREE.Group(); p4MachineGroup.position.y = -2; p4Scene.add(p4MachineGroup);
+    p4Scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    const dl = new THREE.DirectionalLight(0xffeebb, 4); dl.position.set(5,15,10); p4Scene.add(dl);
+
+    p4Silhouette = new THREE.Group(); p4MachineGroup.add(p4Silhouette);
+    const glassMat = new THREE.MeshStandardMaterial({ color: 0x00ffff, transparent: true, opacity: 0.15, wireframe: true, metalness: 0.9, roughness: 0.1 });
+    const torso = new THREE.Mesh(new THREE.CylinderGeometry(1.4,1.0,4.5,16), glassMat.clone()); torso.position.y = 2.2; p4Silhouette.add(torso);
+    const headM = new THREE.Mesh(new THREE.SphereGeometry(0.75,24,24), glassMat.clone()); headM.position.y = 5.5; p4Silhouette.add(headM);
+    const limbGeo = new THREE.CylinderGeometry(0.18,0.12,3.8,8); limbGeo.translate(0,-1.9,0);
+    const lArm = new THREE.Mesh(limbGeo, glassMat.clone()); lArm.position.set(1.4,4.2,0); lArm.rotation.z = Math.PI/3.5;
+    const rArm = new THREE.Mesh(limbGeo, glassMat.clone()); rArm.position.set(-1.4,4.2,0); rArm.rotation.z = -Math.PI/3.5;
+    p4Silhouette.add(lArm, rArm);
+    const legGeo = new THREE.CylinderGeometry(0.35,0.15,6,8);
+    const lLeg = new THREE.Mesh(legGeo, glassMat.clone()); lLeg.position.set(-0.6,-2.8,0);
+    const rLeg = new THREE.Mesh(legGeo, glassMat.clone()); rLeg.position.set(0.6,-2.8,0);
+    p4Silhouette.add(lLeg, rLeg);
+
+    const mC = document.createElement('canvas'); mC.width = 512; mC.height = 512;
+    const mCtx = mC.getContext('2d'); mCtx.fillStyle = '#fff'; mCtx.fillRect(0,0,512,512);
+    for (let i = 0; i < 1200; i++) { mCtx.strokeStyle = `rgba(180,180,180,${Math.random()*0.4})`; mCtx.beginPath(); mCtx.moveTo(Math.random()*512, Math.random()*512); mCtx.lineTo(Math.random()*512, Math.random()*512); mCtx.stroke(); }
+    const mTex = new THREE.CanvasTexture(mC);
+
+    const mkGear = (radius, teeth) => {
+        const shape = new THREE.Shape(); const td = radius*0.25, tw = (Math.PI*2)/teeth;
+        for (let i = 0; i < teeth; i++) {
+            const a = i*tw;
+            shape.lineTo(Math.cos(a)*radius, Math.sin(a)*radius);
+            shape.lineTo(Math.cos(a+tw*0.3)*(radius+td), Math.sin(a+tw*0.3)*(radius+td));
+            shape.lineTo(Math.cos(a+tw*0.7)*(radius+td), Math.sin(a+tw*0.7)*(radius+td));
+            shape.lineTo(Math.cos(a+tw)*radius, Math.sin(a+tw)*radius);
+        }
+        const hole = new THREE.Path(); hole.absarc(0,0,radius*0.4,0,Math.PI*2,true); shape.holes.push(hole);
+        return new THREE.ExtrudeGeometry(shape, { depth: 0.2, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.05 });
+    };
+    for (let i = 0; i < 35; i++) {
+        const radius = 0.15 + Math.random()*0.45;
+        const gearMat = new THREE.MeshStandardMaterial({ color: 0xffcc33, metalness: 1, roughness: 0.05, bumpMap: mTex, bumpScale: 0.05 });
+        const gear = new THREE.Mesh(mkGear(radius, 10+Math.floor(Math.random()*4)), gearMat);
+        const angle = Math.random()*Math.PI*2, dist = Math.random()*1;
+        gear.position.set(Math.cos(angle)*dist, 0.8+Math.random()*3.8, Math.sin(angle)*dist);
+        gear.userData = { rotFactor: (Math.random()-0.5)*0.15, origin: gear.position.clone() };
+        p4Gears.push(gear); p4Silhouette.add(gear);
+    }
+
+    const pCount = 500, pGeo = new THREE.BufferGeometry(), pPos = new Float32Array(pCount*3), pData = [];
+    for (let i = 0; i < pCount; i++) {
+        const g1 = p4Gears[Math.floor(Math.random()*p4Gears.length)];
+        const g2 = p4Gears[Math.floor(Math.random()*p4Gears.length)];
+        pData.push({ g1, g2, t: Math.random(), spd: 0.003+Math.random()*0.007, off: new THREE.Vector3((Math.random()-0.5)*0.3,(Math.random()-0.5)*0.3,(Math.random()-0.5)*0.3) });
+    }
+    pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+    p4Particles = new THREE.Points(pGeo, new THREE.PointsMaterial({ size: 0.12, color: 0x00ffff, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending }));
+    p4Particles.userData.pData = pData; p4Silhouette.add(p4Particles);
+
+    p4Paramatma = new THREE.Mesh(new THREE.SphereGeometry(0.55,32,32), new THREE.MeshBasicMaterial({ color: 0xffffee, transparent: true, opacity: 1, blending: THREE.AdditiveBlending }));
+    p4Paramatma.position.set(0,3.5,0.4); p4Silhouette.add(p4Paramatma);
+    p4Atma = new THREE.Mesh(new THREE.SphereGeometry(0.18,24,24), new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 1 }));
+    p4Silhouette.add(p4Atma);
+
+    // Build yantra audio (all nodes live; volume controlled by masterOut)
+    p4BuildAudio();
+
+    const slider = document.getElementById('speed4');
+    slider.addEventListener('mousedown',  () => { p4UserInteracting = true; });
+    slider.addEventListener('touchstart', () => { p4UserInteracting = true; });
+    window.addEventListener('mouseup',  () => { p4UserInteracting = false; });
+    window.addEventListener('touchend', () => { p4UserInteracting = false; });
+    slider.addEventListener('input', e => { p4CurrentSpeed = parseFloat(e.target.value); p4UpdateUI(); });
+    window.addEventListener('pointermove', e => { if (currentPage === 4) p4TargetRotY = (e.clientX/innerWidth-0.5)*1.5; });
+
+    p4UpdateUI();
+    p4Animate();
+}
+
+function p4BuildAudio() {
+    if (p4GainVsat) return; // already built
+    const ac = getAC();
+    const out = getMaster();
+
+    // Shared convolution reverb
+    const rLen = ac.sampleRate * 4;
+    const rBuf = ac.createBuffer(2, rLen, ac.sampleRate);
+    for (let c = 0; c < 2; c++) {
+        const d = rBuf.getChannelData(c);
+        for (let i = 0; i < rLen; i++) d[i] = (Math.random()*2-1)*Math.pow(1-i/rLen, 1.8);
+    }
+    const reverb = ac.createConvolver(); reverb.buffer = rBuf;
+    const rvG = ac.createGain(); rvG.gain.value = 0.35;
+    reverb.connect(rvG); rvG.connect(out);
+
+    // ── LAYER 0: V.SATTVA — pure binaural drone, no percussive events ──
+    p4GainVsat = ac.createGain(); p4GainVsat.gain.value = 0.065;
+    const vs1 = ac.createOscillator(); vs1.type = 'sine'; vs1.frequency.value = 108;
+    const vs2 = ac.createOscillator(); vs2.type = 'sine'; vs2.frequency.value = 112;
+    vs1.connect(p4GainVsat); vs2.connect(p4GainVsat);
+    const vs3 = ac.createOscillator(); vs3.type = 'triangle'; vs3.frequency.value = 324;
+    const vs3G = ac.createGain(); vs3G.gain.value = 0.012; vs3.connect(vs3G); vs3G.connect(p4GainVsat);
+    const vs5 = ac.createOscillator(); vs5.type = 'sine'; vs5.frequency.value = 540;
+    const vs5G = ac.createGain(); vs5G.gain.value = 0.005; vs5.connect(vs5G); vs5G.connect(p4GainVsat);
+    const vsLfo = ac.createOscillator(); vsLfo.type = 'sine'; vsLfo.frequency.value = 0.05;
+    const vsLfoG = ac.createGain(); vsLfoG.gain.value = 0.03; vsLfo.connect(vsLfoG); vsLfoG.connect(p4GainVsat.gain);
+    const vsVib = ac.createOscillator(); vsVib.type = 'sine'; vsVib.frequency.value = 5.2;
+    const vsVibG = ac.createGain(); vsVibG.gain.value = 0.3; vsVib.connect(vsVibG); vsVibG.connect(vs1.frequency);
+    [vs1,vs2,vs3,vs5,vsLfo,vsVib].forEach(o => o.start());
+    p4GainVsat.connect(out); p4GainVsat.connect(reverb);
+
+    // ── LAYER 1: SATTVA — pentatonic harmonic shimmer ──
+    p4GainSat = ac.createGain(); p4GainSat.gain.value = 0;
+    [220, 275, 330, 440, 550].forEach((f, i) => {
+        const o = ac.createOscillator(); o.type = 'sine'; o.frequency.value = f;
+        const g = ac.createGain(); g.gain.value = 0.022 - i*0.003;
+        o.connect(g); g.connect(p4GainSat); o.start();
+    });
+    const satMel = ac.createOscillator(); satMel.type = 'triangle'; satMel.frequency.value = 660;
+    const satMelG = ac.createGain(); satMelG.gain.value = 0;
+    satMel.connect(satMelG); satMelG.connect(p4GainSat);
+    const satLfo = ac.createOscillator(); satLfo.type = 'sine'; satLfo.frequency.value = 1.2;
+    const satLfoG = ac.createGain(); satLfoG.gain.value = 0.015; satLfo.connect(satLfoG); satLfoG.connect(satMelG.gain);
+    satMel.start(); satLfo.start();
+    p4GainSat.connect(out); p4GainSat.connect(reverb);
+
+    // ── LAYER 2: RAJAS — acid techno ──
+    p4GainRaj = ac.createGain(); p4GainRaj.gain.value = 0;
+    const rajBass = ac.createOscillator(); rajBass.type = 'sawtooth'; rajBass.frequency.value = 110;
+    const rajFilt = ac.createBiquadFilter(); rajFilt.type = 'lowpass'; rajFilt.frequency.value = 400; rajFilt.Q.value = 8;
+    const rajLfo = ac.createOscillator(); rajLfo.type = 'sine'; rajLfo.frequency.value = 4;
+    const rajLfoG = ac.createGain(); rajLfoG.gain.value = 1200;
+    rajLfo.connect(rajLfoG); rajLfoG.connect(rajFilt.frequency);
+    rajBass.connect(rajFilt); rajFilt.connect(p4GainRaj);
+    const rajStab = ac.createOscillator(); rajStab.type = 'square'; rajStab.frequency.value = 220;
+    const rajStabG = ac.createGain(); rajStabG.gain.value = 0;
+    rajStab.connect(rajStabG); rajStabG.connect(p4GainRaj);
+    p4GainRaj._stab = rajStabG;
+    [rajBass, rajLfo, rajStab].forEach(o => o.start());
+    p4GainRaj.connect(out);
+
+    // Kick sequencer
+    const BPM = 140, beat = 60/BPM/4*1000;
+    const schedKick = () => {
+        if (!p4Init) return;
+        const raj = Math.max(0, 1-Math.abs(p4CurrentSpeed-2));
+        if (raj > 0.05 && p4RajPattern[p4RajStep]) {
+            const t = ac.currentTime;
+            const kick = ac.createOscillator(); kick.type = 'sine';
+            kick.frequency.setValueAtTime(180, t);
+            kick.frequency.exponentialRampToValueAtTime(40, t+0.08);
+            const kickG = ac.createGain(); kickG.gain.setValueAtTime(0.4*raj, t);
+            kickG.gain.exponentialRampToValueAtTime(0.001, t+0.12);
+            kick.connect(kickG); kickG.connect(out); kick.start(t); kick.stop(t+0.15);
+            if (p4RajStep === 0 || p4RajStep === 4) {
+                rajStabG.gain.setValueAtTime(0.1*raj, t);
+                rajStabG.gain.exponentialRampToValueAtTime(0.001, t+0.05);
+            }
+        }
+        p4RajStep = (p4RajStep+1)%8;
+        setTimeout(schedKick, beat);
+    };
+    schedKick();
+
+    // ── LAYER 3: TAMAS — dark, inert, heavy ──
+    p4GainTam = ac.createGain(); p4GainTam.gain.value = 0;
+    const tamSub = ac.createOscillator(); tamSub.type = 'sine'; tamSub.frequency.value = 40;
+    const tamSubG = ac.createGain(); tamSubG.gain.value = 0.08; tamSub.connect(tamSubG); tamSubG.connect(p4GainTam);
+    const tamD1 = ac.createOscillator(); tamD1.type = 'triangle'; tamD1.frequency.value = 146;
+    const tamD2 = ac.createOscillator(); tamD2.type = 'triangle'; tamD2.frequency.value = 138;
+    const tamDG = ac.createGain(); tamDG.gain.value = 0.025; tamD1.connect(tamDG); tamD2.connect(tamDG); tamDG.connect(p4GainTam);
+    const tamLfo = ac.createOscillator(); tamLfo.type = 'sine'; tamLfo.frequency.value = 0.03;
+    const tamLfoG = ac.createGain(); tamLfoG.gain.value = 0.02; tamLfo.connect(tamLfoG); tamLfoG.connect(p4GainTam.gain);
+    const nBuf = ac.createBuffer(1, ac.sampleRate*2, ac.sampleRate);
+    const nd = nBuf.getChannelData(0); for (let i = 0; i < nBuf.length; i++) nd[i] = Math.random()*2-1;
+    const noise = ac.createBufferSource(); noise.buffer = nBuf; noise.loop = true;
+    const nFilt = ac.createBiquadFilter(); nFilt.type = 'lowpass'; nFilt.frequency.value = 80;
+    const nG = ac.createGain(); nG.gain.value = 0.018; noise.connect(nFilt); nFilt.connect(nG); nG.connect(p4GainTam);
+    [tamSub, tamD1, tamD2, tamLfo].forEach(o => o.start()); noise.start();
+    p4GainTam.connect(out); p4GainTam.connect(reverb);
+}
+
+function p4SetGains() {
+    if (!p4GainVsat) return;
+    const ac = getAC(), t = ac.currentTime, tc = 0.3;
+    const vsat = Math.max(0, 1 - p4CurrentSpeed);
+    const sat  = Math.max(0, 1 - Math.abs(p4CurrentSpeed - 1));
+    const raj  = Math.max(0, 1 - Math.abs(p4CurrentSpeed - 2));
+    const tam  = Math.max(0, p4CurrentSpeed - 2);
+    p4GainVsat.gain.setTargetAtTime(vsat * 0.065, t, tc);
+    p4GainSat.gain.setTargetAtTime(sat  * 0.060, t, tc);
+    p4GainRaj.gain.setTargetAtTime(raj  * 0.055, t, tc);
+    p4GainTam.gain.setTargetAtTime(tam  * 0.070, t, tc);
+}
+
+function p4Silence() {
+    // Nothing — layers continue; masterOut controls overall volume
+    // (stops audio naturally when globalAudioOn is false or master is 0)
+}
+
+function p4GetColor(v) {
+    const i = Math.floor(v), f = v-i;
+    if (i >= p4GunaColors.length-1) return p4GunaColors[p4GunaColors.length-1].clone();
+    return p4GunaColors[i].clone().lerp(p4GunaColors[i+1], f);
+}
+
+function p4UpdateUI() {
+    const idx = Math.min(Math.floor(p4CurrentSpeed), 3);
+    const color = p4GetColor(p4CurrentSpeed);
+    const hex = '#'+color.getHexString();
+    document.getElementById('guna-title-p4').textContent = p4Titles[idx];
+    document.getElementById('guna-title-p4').style.color = hex;
+    if (p4Particles) p4Particles.material.color.copy(color);
+    for (let i = 0; i <= 3; i++) {
+        const l = document.getElementById('g4-'+i);
+        if (l) l.className = 'guna-lbl' + (i === idx ? ' active-guna' : '');
+    }
+    p4SetGains(); // always sync audio to slider
+}
+
+function p4Animate() {
+    requestAnimationFrame(p4Animate);
+    if (currentPage !== 4) return;
+    const time = performance.now()*0.001;
+    const slider = document.getElementById('speed4');
+
+    if (!p4UserInteracting) {
+        if (p4CurrentSpeed > 0 && p4CurrentSpeed < 1.5) p4CurrentSpeed -= p4CurrentSpeed*0.004;
+        else if (p4CurrentSpeed >= 1.5 && p4CurrentSpeed < 3) p4CurrentSpeed += (3-p4CurrentSpeed)*0.006;
+        slider.value = p4CurrentSpeed;
+        p4UpdateUI();
+    }
+
+    const vsat = Math.max(0, 1-p4CurrentSpeed);
+    const sat  = Math.max(0, 1-Math.abs(p4CurrentSpeed-1));
+    const raj  = Math.max(0, 1-Math.abs(p4CurrentSpeed-2));
+    const tam  = Math.max(0, p4CurrentSpeed-2);
+
+    p4MachineGroup.rotation.y += (p4TargetRotY - p4MachineGroup.rotation.y)*0.05;
+    const curColor = p4GetColor(p4CurrentSpeed);
+
+    p4Silhouette.traverse(child => {
+        if (child.isMesh && child.material && !p4Gears.includes(child) && child !== p4Atma && child !== p4Paramatma) {
+            child.material.color.lerp(curColor, 0.1);
+            child.material.opacity = 0.1+vsat*0.15+sat*0.2+raj*0.1+tam*0.08;
+            child.material.emissiveIntensity = vsat*1+sat*0.6+raj*0.3+tam*0.4;
+            child.material.emissive = curColor;
+        }
+    });
+
+    p4Gears.forEach(g => {
+        const sm = vsat*0.2+sat*0.4+raj*18+tam*0.03;
+        g.rotation.z += g.userData.rotFactor*sm;
+        const md = Math.min(1, raj*0.8+tam);
+        g.material.roughness = 0.05+md*0.9; g.material.metalness = 1-tam*0.8;
+        g.material.color.copy(new THREE.Color(0xfff000)).lerp(new THREE.Color(0x050402), md);
+        if (raj > 0.1) {
+            const sh = raj*0.08;
+            g.position.set(g.userData.origin.x+(Math.random()-0.5)*sh, g.userData.origin.y+(Math.random()-0.5)*sh, g.userData.origin.z+(Math.random()-0.5)*sh);
+        } else { g.position.copy(g.userData.origin); }
+    });
+
+    const pos = p4Particles.geometry.attributes.position;
+    const data = p4Particles.userData.pData;
+    const fm = vsat*0.4+sat*0.6+raj*25+tam*0.1;
+    for (let i = 0; i < data.length; i++) {
+        const p = data[i]; p.t = (p.t + p.spd*fm) % 1;
+        const s = p.g1.position, e = p.g2.position;
+        const x = (1-p.t)**2*s.x+2*(1-p.t)*p.t*(s.x+e.x)/2+p.t**2*e.x;
+        const y = (1-p.t)**2*s.y+2*(1-p.t)*p.t*((s.y+e.y)/2+0.8)+p.t**2*e.y;
+        const z = (1-p.t)**2*s.z+2*(1-p.t)*p.t*(s.z+e.z)/2+p.t**2*e.z;
+        pos.setXYZ(i, x+p.off.x, y+p.off.y, z+p.off.z);
+    }
+    pos.needsUpdate = true;
+    p4Particles.material.opacity = 0.8-tam*0.5;
+
+    const os = (vsat*0.4+sat*0.7+raj*18+tam*0.15)*2;
+    p4Atma.position.x = Math.cos(time*os)*0.7;
+    p4Atma.position.y = 3.5+Math.sin(time*os*0.5)*0.5;
+    p4Atma.position.z = 0.4+Math.sin(time*os)*0.7;
+    p4Paramatma.material.opacity = 0.9+vsat*0.1-tam*0.2;
+    p4Renderer.render(p4Scene, p4Camera);
+}
+
+window.addEventListener('resize', () => {
+    if (p4Renderer) { p4Renderer.setSize(innerWidth, innerHeight); p4Camera.aspect = innerWidth/innerHeight; p4Camera.updateProjectionMatrix(); }
+});
+</script>
 </body>
 </html>
