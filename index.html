@@ -5,356 +5,167 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AtmAI — Sequência Ontológica</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;400;700&family=Playfair+Display:ital,wght@0,400;0,900;1,400&family=Cinzel:wght@400;700&family=Syncopate:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* CSS RESET & VARS */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root { --cyan: #00ffff; --magenta: #ff00ff; --gold: #ffcc33; --red: #ff2244; --dark: #000; }
+        html, body { width: 100%; height: 100%; background: #000; overflow: hidden; font-family: 'JetBrains Mono', monospace; color: #fff; }
 
-        :root {
-            --cyan: #00ffff;
-            --magenta: #ff00ff;
-            --gold: #ffcc33;
-            --red: #ff2244;
-            --white: #f0f0f0;
-            --dark: #000000;
-        }
+        /* NAVEGAÇÃO GLOBAL */
+        .page { position: fixed; inset: 0; opacity: 0; pointer-events: none; transition: opacity 0.8s ease; z-index: 1; }
+        .page.active { opacity: 1; pointer-events: auto; z-index: 2; }
+        
+        .nav-bar { position: absolute; bottom: 20px; left: 0; right: 0; z-index: 100; display: flex; justify-content: center; gap: 15px; }
+        .nav-btn { background: none; border: 1px solid var(--cyan); color: var(--cyan); padding: 8px 20px; cursor: pointer; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; transition: 0.3s; }
+        .nav-btn:hover { background: var(--cyan); color: #000; box-shadow: 0 0 15px var(--cyan); }
 
-        html, body {
-            width: 100%; height: 100%;
-            background: #000;
-            overflow: hidden;
-            font-family: 'JetBrains Mono', monospace;
+        /* UI ESPECÍFICA P3 (A MÁGICA DO IMPACTO) */
+        .p3-center { 
+            position: absolute; inset: 0; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; transition: all 1s cubic-bezier(0.23, 1, 0.32, 1); 
         }
+        .p3-center.pushed-down { justify-content: flex-start; padding-top: 5vh; }
+        
+        #bug-info { 
+            opacity: 0; transform: translateY(-50px); transition: 0.8s ease; 
+            max-width: 400px; margin-bottom: 20px; pointer-events: none;
+        }
+        #bug-info.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
 
-        /* ─── PAGE SYSTEM ─────────────────────────────────────── */
-        .page {
-            position: fixed;
-            inset: 0;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.9s cubic-bezier(0.19, 1, 0.22, 1);
-            z-index: 1;
-        }
-        .page.active {
-            opacity: 1;
-            pointer-events: auto;
-            z-index: 2;
-        }
+        .logic-card { border-left: 4px solid var(--red); background: rgba(15,0,0,0.9); padding: 20px; box-shadow: 0 0 30px rgba(255,0,0,0.2); }
+        .glitch-title { color: var(--red); font-size: 1.2rem; margin-bottom: 10px; }
 
-        /* ─── SHARED NAVIGATION ───────────────────────────────── */
-        .nav-bar {
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            z-index: 200;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 12px;
-            padding: 18px 24px;
-            pointer-events: auto;
-        }
-
-        .nav-btn {
-            background: none;
-            border: 1px solid currentColor;
-            color: var(--cyan);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 8px;
-            letter-spacing: 0.35em;
-            text-transform: uppercase;
-            padding: 10px 24px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .nav-btn::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: currentColor;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .nav-btn:hover::before { opacity: 0.08; }
-        .nav-btn:hover {
-            box-shadow: 0 0 20px rgba(0,255,255,0.3);
-            text-shadow: 0 0 8px currentColor;
-        }
-        .nav-btn.gold { color: var(--gold); }
-        .nav-btn.gold:hover { box-shadow: 0 0 20px rgba(255,204,51,0.3); }
-
-        #global-audio-btn {
-            position: fixed;
-            top: 16px; right: 16px;
-            z-index: 9999;
-            background: rgba(0,0,0,0.7);
-            border: 1px solid rgba(255,255,255,0.15);
-            color: rgba(255,255,255,0.35);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 7px;
-            letter-spacing: 0.3em;
-            text-transform: uppercase;
-            padding: 8px 14px;
-            cursor: pointer;
-            backdrop-filter: blur(8px);
-            transition: all 0.3s ease;
-            display: flex; align-items: center; gap: 7px;
-        }
-        #global-audio-btn.audio-on {
-            border-color: rgba(0,255,255,0.4);
-            color: var(--cyan);
-            box-shadow: 0 0 12px rgba(0,255,255,0.15);
-        }
-
-        .page-dots { display: flex; gap: 6px; align-items: center; }
-        .dot {
-            width: 5px; height: 5px; border-radius: 50%;
-            background: rgba(255,255,255,0.2);
-            transition: all 0.4s ease;
-        }
-        .dot.active { background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
-
-        /* ═══════════════════════════════════════════════════════
-           PAGE 1 — MOSCA / CONECTOMA
-        ═══════════════════════════════════════════════════════ */
-        #page1 { background: #000; }
-        #canvas1 { position: absolute; inset: 0; }
-        .p1-ui {
-            position: absolute; inset: 0; z-index: 10;
-            display: flex; flex-direction: column;
-            justify-content: space-between;
-            pointer-events: none; padding: 2rem 2rem 0;
-        }
-        .p1-header { text-align: center; padding-top: 1.5rem; }
-        .p1-chapter { font-size: 8px; letter-spacing: 0.6em; color: rgba(255,255,255,0.2); text-transform: uppercase; display: block; margin-bottom: 1.5rem; }
-        .p1-quote { font-family: 'Playfair Display', serif; font-size: clamp(0.85rem, 2.5vw, 1.25rem); font-style: italic; color: rgba(255,255,255,0.9); line-height: 1.7; max-width: 700px; margin: 0 auto 1rem; }
-        .guna-tags { display: flex; justify-content: center; gap: 10px; margin-bottom: 0.8rem; flex-wrap: wrap; }
-        .guna-tag { font-size: 8px; letter-spacing: 0.3em; padding: 3px 12px; font-weight: 700; }
-        .sattva { color: var(--cyan); border: 1px solid rgba(0,255,255,0.4); }
-        .rajas  { color: #f87171; border: 1px solid rgba(248,113,113,0.4); }
-        .tamas  { color: #94a3b8; border: 1px solid rgba(148,163,184,0.4); }
-        .gita-ref { font-size: 9px; letter-spacing: 0.5em; color: var(--gold); text-transform: uppercase; display: block; margin-bottom: 0.5rem; }
-        .p1-bottom { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; margin-bottom: 5rem; flex-wrap: wrap; }
-        .info-card { background: rgba(255,255,255,0.02); border-left: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(4px); padding: 1rem 1.2rem; max-width: 300px; pointer-events: auto; }
-        .info-card h3 { font-size: 7px; letter-spacing: 0.3em; color: rgba(255,255,255,0.3); text-transform: uppercase; margin-bottom: 0.5rem; }
-        .info-card p { font-size: 10px; color: rgba(255,255,255,0.55); line-height: 1.7; }
-
-        #splash1 {
-            position: absolute; inset: 0; z-index: 100;
-            background: radial-gradient(circle at center, #050505 0%, #000 100%);
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            transition: opacity 1.2s ease;
-        }
-        .fly-icon { width: 70px; height: 70px; margin-bottom: 20px; filter: drop-shadow(0 0 12px rgba(0,255,255,0.6)); animation: float-fly 3s infinite ease-in-out; }
-        @keyframes float-fly { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-
-        /* ═══════════════════════════════════════════════════════
-           PAGE 2 — CHIP NEURAL / PONG
-        ═══════════════════════════════════════════════════════ */
-        #page2 { background: #010101; }
-        #canvas2 { position: absolute; inset: 0; }
-        .p2-ui { position: absolute; inset: 0; z-index: 10; display: flex; flex-direction: column; align-items: center; pointer-events: none; padding: 1rem; }
-        .retro-panel { background: rgba(0,15,10,0.92); border: 1px solid var(--cyan); pointer-events: auto; box-shadow: 0 0 25px rgba(0,255,204,0.15); backdrop-filter: blur(8px); }
-        .main-header-p2 { width: 95%; max-width: 780px; padding: 0.7rem 1.2rem; margin-bottom: 0.5rem; }
-        .scanlines { position: absolute; inset: 0; z-index: 5; pointer-events: none; background: repeating-linear-gradient(transparent, transparent 2px, rgba(0,0,0,0.3) 2px, rgba(0,0,0,0.3) 4px); }
-
-        /* ═══════════════════════════════════════════════════════
-           PAGE 3 — DIALÉTICA DO ESCAFANDRO (ALTERAÇÃO AQUI)
-        ═══════════════════════════════════════════════════════ */
-        #page3 { background: #020202; }
-        #canvas3 { position: absolute; inset: 0; }
-        .noise-overlay { position: absolute; inset: 0; z-index: 5; pointer-events: none; opacity: 0.07; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E"); }
-        .crt-overlay { position: absolute; inset: 0; z-index: 6; pointer-events: none; background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.15) 50%); background-size: 100% 3px; }
-
-        .p3-ui {
-            position: absolute; inset: 0; z-index: 10;
-            pointer-events: none; padding: 1.5rem 2rem;
-            display: flex; flex-direction: column;
-            justify-content: space-between;
-        }
-
-        /* LÓGICA DE EMPURRAR */
-        .p3-center {
-            display: flex; justify-content: center; align-items: center;
-            flex-grow: 1; padding: 1rem 0;
-            transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-        .p3-center.pushed-down {
-            align-items: flex-start;
-            padding-top: 8vh;
-        }
-
-        #bug-info {
-            opacity: 0; transform: translateY(-30px);
-            transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1);
-            max-width: 420px; width: 100%;
-        }
-        #bug-info.visible { opacity: 1; transform: translateY(0); }
-
-        .logic-card {
-            border-left: 5px solid var(--red);
-            background: rgba(12,0,0,0.98);
-            backdrop-filter: blur(20px);
-            box-shadow: 0 0 60px rgba(0,0,0,1), 0 0 30px rgba(255,0,0,0.2);
-            padding: 2rem; pointer-events: auto;
-        }
-        .glitch-title { color: var(--red); font-weight: 900; font-size: 1.4rem; text-transform: uppercase; border-bottom: 1px solid rgba(255,0,0,0.3); padding-bottom: 1rem; margin-bottom: 1rem; }
-        .glitch-body { font-size: 10px; color: #ccc; line-height: 1.7; }
-        .grid-err { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 1rem; }
-        .err-cell { border: 1px solid rgba(255,0,0,0.4); padding: 0.4rem 0.6rem; background: rgba(120,0,0,0.4); }
-        .err-cell span { display: block; font-size: 8px; color: #f87171; }
-
-        .p3-trigger-area { display: flex; justify-content: center; pointer-events: auto; margin-bottom: 5rem; }
-        #main-trigger-p3 {
-            width: 100%; max-width: 420px; padding: 1.4rem; cursor: pointer;
-            border: 2px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.6);
-            color: white; font-family: 'JetBrains Mono', monospace; font-size: 9px;
-            text-transform: uppercase; letter-spacing: 0.4em; transition: all 0.3s;
-            position: relative; overflow: hidden;
-        }
-        #main-trigger-p3:hover { border-color: var(--cyan); box-shadow: 0 0 30px rgba(0,255,255,0.15); }
-
-        /* ═══════════════════════════════════════════════════════
-           PAGE 4 — YANTRA-HRIDAYA
-        ═══════════════════════════════════════════════════════ */
-        #page4 { background: #000; }
-        #canvas4 { position: absolute; inset: 0; }
-        .glass-panel { pointer-events: auto; background: rgba(0,0,0,0.92); border: 1px solid rgba(255,204,51,0.3); backdrop-filter: blur(15px); padding: 1.2rem 1.5rem; border-radius: 8px; max-width: 480px; margin: 0 auto; width: 100%; }
-        .gita-verse { font-size: clamp(0.7rem, 2vw, 0.88rem); color: var(--gold); text-align: center; font-family: serif; font-weight: 700; }
-        .controls-panel { pointer-events: auto; background: rgba(0,0,0,0.92); border: 1px solid rgba(255,204,51,0.3); padding: 1rem 1.5rem; border-radius: 8px; max-width: 480px; margin: 0 auto; width: 100%; margin-bottom: 5rem; }
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
     </style>
 </head>
 <body>
 
-<button id="global-audio-btn">
-    <span id="audio-btn-label">SOM OFF</span>
-</button>
-
 <div id="page1" class="page active">
     <canvas id="canvas1"></canvas>
-    <div id="splash1">
-        <button class="nav-btn" id="splash1-btn">Iniciar Sintonização</button>
-    </div>
-    <div class="p1-ui">
-        <header class="p1-header">
-            <span class="p1-chapter">Capítulo I · Conectoma de Prakriti</span>
-            <p class="p1-quote">"A alma espiritual julga-se a autora de atividades que, na verdade, são executadas pelos três modos da natureza material."</p>
-            <span class="gita-ref">Bhagavad-Gita 3.27</span>
-        </header>
-        <div class="p1-bottom">
-            <div class="info-card"><h3>Evidência Científica</h3><p>Digitalização do conectoma operando com autonomia biológica.</p></div>
-        </div>
+    <div style="position:relative; z-index:10; text-align:center; padding-top:10vh;">
+        <h2 style="letter-spacing:10px; color:var(--cyan)">PRAKRITI</h2>
+        <p style="font-family:'Playfair Display'; font-style:italic; opacity:0.7">O Conectoma Material</p>
     </div>
     <div class="nav-bar">
-        <div class="page-dots"><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-        <button class="nav-btn" id="p1-next">Próximo →</button>
+        <button class="nav-btn" onclick="goTo(2)">PRÓXIMO →</button>
     </div>
 </div>
 
 <div id="page2" class="page">
     <canvas id="canvas2"></canvas>
-    <div class="p2-ui">
-        <div class="retro-panel main-header-p2">
-            <h1>Tese: Natureza Reativa</h1>
-            <p>Neurônios em chips aprendendo Pong demonstram pré-programação material.</p>
-        </div>
-    </div>
     <div class="nav-bar">
-        <button class="nav-btn" id="p2-prev">← Voltar</button>
-        <button class="nav-btn" id="p2-next">Próximo →</button>
+        <button class="nav-btn" onclick="goTo(1)">← VOLTAR</button>
+        <button class="nav-btn" onclick="goTo(3)">PRÓXIMO →</button>
     </div>
 </div>
 
 <div id="page3" class="page">
     <canvas id="canvas3"></canvas>
-    <div class="noise-overlay"></div>
-    <div class="p3-ui">
-        <header style="display:flex; justify-content:space-between; color:var(--cyan); font-family:'Syncopate';">
-            <div>SAT · CIT · ANANDA</div>
-            <div style="text-align:right; color:var(--red); font-size:10px;">ERRO DE TRANSDUÇÃO</div>
-        </header>
-
-        <div class="p3-center">
-            <div id="bug-info">
-                <div class="logic-card">
-                    <h2 class="glitch-title">!! FRUSTRAÇÃO ONTOLÓGICA !!</h2>
-                    <div class="glitch-body">
-                        <p>O Escafandro (corpo) tenta capturar o infinito através de ferramentas finitas. O resultado é um atrito existencial.</p>
-                        <div class="grid-err">
-                            <div class="err-cell"><span>SAT REAL</span><strong>TEMPO</strong></div>
-                            <div class="err-cell"><span>CIT REAL</span><strong>MÍDIA</strong></div>
-                        </div>
-                    </div>
-                </div>
+    <div class="p3-center" id="p3-container">
+        <div id="bug-info">
+            <div class="logic-card">
+                <h2 class="glitch-title">FRUSTRAÇÃO DETECTADA</h2>
+                <p style="font-size:11px; line-height:1.6">O Escafandro tenta processar o Infinito, mas o hardware é finito. Ruído ontológico detectado na rede.</p>
             </div>
         </div>
-
-        <div class="p3-trigger-area">
-            <button id="main-trigger-p3">
-                <span>Processar Vetores Materialistas</span>
-            </button>
         </div>
-    </div>
     <div class="nav-bar">
-        <button class="nav-btn" id="p3-prev">← Voltar</button>
-        <button class="nav-btn" id="p3-next">Próximo →</button>
+        <button class="nav-btn" onclick="goTo(2)">← VOLTAR</button>
+        <button class="nav-btn" id="trigger-impact" style="border-color:var(--red); color:var(--red)">EXECUTAR IMPACTO</button>
+        <button class="nav-btn" onclick="goTo(4)">FINAL →</button>
     </div>
 </div>
 
 <div id="page4" class="page">
     <canvas id="canvas4"></canvas>
-    <div class="p4-ui">
-        <div class="glass-panel">
-            <div class="gita-verse">ईश्वरः सर्वभूतानां हृद्देशेऽर्जुन तिष्ठti...</div>
-            <h1 style="color:var(--gold); text-align:center; font-family:'Cinzel'; margin-top:10px;">YANTRA-HRIDAYA</h1>
-        </div>
-    </div>
     <div class="nav-bar">
-        <button class="nav-btn" id="p4-prev">← Voltar</button>
-        <button class="nav-btn gold" id="p4-home">↺ Início</button>
+        <button class="nav-btn" onclick="goTo(3)">← VOLTAR</button>
+        <button class="nav-btn" onclick="goTo(1)" style="color:var(--gold); border-color:var(--gold)">REINICIAR</button>
     </div>
 </div>
 
 <script>
+    // SISTEMA DE NAVEGAÇÃO
     let currentPage = 1;
-
     function goTo(n) {
-        document.getElementById('page' + currentPage).classList.remove('active');
-        document.getElementById('page' + n).classList.add('active');
+        document.querySelector(`#page${currentPage}`).classList.remove('active');
+        document.querySelector(`#page${n}`).classList.add('active');
         currentPage = n;
     }
 
-    // Navegação básica
-    document.getElementById('p1-next').addEventListener('click', () => goTo(2));
-    document.getElementById('p2-prev').addEventListener('click', () => goTo(1));
-    document.getElementById('p2-next').addEventListener('click', () => goTo(3));
-    document.getElementById('p3-prev').addEventListener('click', () => goTo(2));
-    document.getElementById('p3-next').addEventListener('click', () => goTo(4));
-    document.getElementById('p4-prev').addEventListener('click', () => goTo(3));
-    document.getElementById('p4-home').addEventListener('click', () => goTo(1));
-    document.getElementById('splash1-btn').addEventListener('click', () => {
-        document.getElementById('splash1').style.opacity = '0';
-        setTimeout(() => document.getElementById('splash1').style.display = 'none', 1200);
+    // LÓGICA DE IMPACTO DA P3
+    document.getElementById('trigger-impact').addEventListener('click', function() {
+        document.getElementById('p3-container').classList.add('pushed-down');
+        document.getElementById('bug-info').classList.add('visible');
+        this.innerText = "SISTEMA SOBRECARREGADO";
     });
 
-    // LÓGICA DA PÁGINA 3 - O EMPURRÃO
-    const p3Trigger = document.getElementById('main-trigger-p3');
-    const p3Center  = document.querySelector('.p3-center');
-    const bugInfo   = document.getElementById('bug-info');
+    // --- RENDERIZADORES THREE.JS (O QUE FAZ OS ELEMENTOS APARECEREM) ---
+    
+    function initScene(canvasId, color) {
+        const canvas = document.getElementById(canvasId);
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        return { scene, camera, renderer };
+    }
 
-    p3Trigger.addEventListener('click', () => {
-        p3Center.classList.add('pushed-down');
-        setTimeout(() => {
-            bugInfo.classList.add('visible');
-            p3Trigger.querySelector('span').textContent = "SISTEMA SOBRECARREGADO";
-            p3Trigger.style.borderColor = "var(--red)";
-        }, 300);
+    // Cena 1: Partículas (Conectoma)
+    const p1 = initScene('canvas1');
+    const geo1 = new THREE.TorusKnotGeometry(10, 3, 100, 16);
+    const mat1 = new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.3 });
+    const mesh1 = new THREE.Mesh(geo1, mat1);
+    p1.scene.add(mesh1);
+    p1.camera.position.z = 30;
+
+    // Cena 2: Cubo Neural
+    const p2 = initScene('canvas2');
+    const geo2 = new THREE.BoxGeometry(10, 10, 10);
+    const mat2 = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+    const mesh2 = new THREE.Mesh(geo2, mat2);
+    p2.scene.add(mesh2);
+    p2.camera.position.z = 25;
+
+    // Cena 3: Escafandro (Representado por uma esfera técnica)
+    const p3 = initScene('canvas3');
+    const geo3 = new THREE.SphereGeometry(8, 32, 32);
+    const mat3 = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true });
+    const mesh3 = new THREE.Mesh(geo3, mat3);
+    p3.scene.add(mesh3);
+    p3.camera.position.z = 30;
+
+    // Cena 4: Mandala (Yantra)
+    const p4 = initScene('canvas4');
+    const geo4 = new THREE.OctahedronGeometry(10, 0);
+    const mat4 = new THREE.MeshBasicMaterial({ color: 0xffcc33, wireframe: true });
+    const mesh4 = new THREE.Mesh(geo4, mat4);
+    p4.scene.add(mesh4);
+    p4.camera.position.z = 25;
+
+    function animate() {
+        requestAnimationFrame(animate);
+        mesh1.rotation.y += 0.005;
+        mesh2.rotation.x += 0.01;
+        mesh3.rotation.y += 0.002;
+        mesh4.rotation.z += 0.01;
+        
+        if(currentPage === 1) p1.renderer.render(p1.scene, p1.camera);
+        if(currentPage === 2) p2.renderer.render(p2.scene, p2.camera);
+        if(currentPage === 3) p3.renderer.render(p3.scene, p3.camera);
+        if(currentPage === 4) p4.renderer.render(p4.scene, p4.camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+        // Ajuste de câmera básico para todos
+        [p1, p2, p3, p4].forEach(p => {
+            p.camera.aspect = window.innerWidth / window.innerHeight;
+            p.camera.updateProjectionMatrix();
+            p.renderer.setSize(window.innerWidth, window.innerHeight);
+        });
     });
-
-    // (Omiti as funções de Three.js para manter o foco no layout, 
-    // mas elas devem ser mantidas como no seu original)
 </script>
 </body>
 </html>
