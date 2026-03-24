@@ -1225,21 +1225,21 @@ function initPage3() {
     const gloveMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.9, metalness: 0.1 });
     
     // Calculate exact glove positions at the end of angled arms
-    const armLength = 0.9; // half of arm length (1.8/2)
+    const armLength = 1.8; // FULL arm length, not half
     const angle = Math.PI/5; // same angle as arms
     
     const leftGlove = new THREE.Mesh(gloveGeo, gloveMat);
     leftGlove.position.set(
-        -1.1 - Math.sin(angle) * armLength,  // x: arm base + horizontal offset
-        1.0 - Math.cos(angle) * armLength,   // y: arm base + vertical drop
+        -1.1 - Math.sin(angle) * armLength,  // x: arm base + full horizontal extension
+        1.0 - Math.cos(angle) * armLength,   // y: arm base + full vertical drop
         0
     );
     suitGroup.add(leftGlove);
     
     const rightGlove = new THREE.Mesh(gloveGeo, gloveMat);
     rightGlove.position.set(
-        1.1 + Math.sin(angle) * armLength,   // x: arm base + horizontal offset
-        1.0 - Math.cos(angle) * armLength,   // y: arm base + vertical drop  
+        1.1 + Math.sin(angle) * armLength,   // x: arm base + full horizontal extension
+        1.0 - Math.cos(angle) * armLength,   // y: arm base + full vertical drop  
         0
     );
     suitGroup.add(rightGlove);
@@ -1295,12 +1295,12 @@ function initPage3() {
     // Debug: verify astronaut exists
     console.log('Astronaut created:', !!p3Astronaut, p3Astronaut?.userData);
 
-    trigger.addEventListener('mousedown', e => {
-        console.log('Button mousedown triggered!');
+    const startProcessing = (e) => {
+        console.log('Button triggered!', e.type);
         if (e.cancelable) e.preventDefault();
         p3Processing = true;
-        bugInfo.style.transition = 'opacity 0.3s ease-in'; // smooth fade in
-        bugInfo.style.opacity = '0.85'; // 85% opacity instead of 15%
+        bugInfo.style.transition = 'opacity 0.3s ease-in';
+        bugInfo.style.opacity = '0.85';
         document.getElementById('page3').classList.add('glitch-active');
         vLabels.forEach(l => l.style.opacity = '1');
         
@@ -1317,12 +1317,12 @@ function initPage3() {
             const ac = getAC();
             p3BugGain.gain.setTargetAtTime(0.6, ac.currentTime, 0.03);
         }
-    });
+    };
 
     const stopProcessing = () => {
         console.log('Stop processing triggered!');
         p3Processing = false;
-        bugInfo.style.transition = 'opacity 0.4s ease-out'; // smooth fade out
+        bugInfo.style.transition = 'opacity 0.4s ease-out';
         bugInfo.style.opacity = '0';
         document.getElementById('page3').classList.remove('glitch-active');
         vLabels.forEach(l => l.style.opacity = '0');
@@ -1339,8 +1339,20 @@ function initPage3() {
         p3BugGain.gain.setTargetAtTime(0, getAC().currentTime, 0.12);
     };
 
+    // Mouse events
+    trigger.addEventListener('mousedown', startProcessing);
     trigger.addEventListener('mouseup', stopProcessing);
+    trigger.addEventListener('mouseleave', stopProcessing);
+    
+    // Touch events for mobile
+    trigger.addEventListener('touchstart', startProcessing, { passive: false });
+    trigger.addEventListener('touchend', stopProcessing);
+    trigger.addEventListener('touchcancel', stopProcessing);
+    
+    // Global fallbacks
     document.addEventListener('mouseup', stopProcessing);
+    document.addEventListener('touchend', stopProcessing);
+    document.addEventListener('touchcancel', stopProcessing);
 
     p3Animate();
 }
