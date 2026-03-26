@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AtmAI — I · Conectoma de Prakriti</title>
+    <title>AtmAI — II · Chip Neural</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;400;700&family=Playfair+Display:ital,wght@0,400;0,900;1,400&family=Cinzel:wght@400;700&family=Syncopate:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -495,45 +495,34 @@
     <span class="audio-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M2 4H4L7 1.5V10.5L4 8H2V4ZM8.5 3.5C9.5 4.5 9.5 7.5 8.5 8.5"/></svg></span>
     <span id="audio-btn-label">SOM OFF</span>
 </button>
-<canvas id="canvas1"></canvas>
-<div id="splash1">
-    <span style="font-size:8px;letter-spacing:0.6em;color:rgba(255,255,255,0.2);text-transform:uppercase;margin-bottom:2rem;">Capítulo I</span>
-    <svg class="fly-icon" viewBox="0 0 100 100" fill="none">
-        <path class="wing-l" d="M45 45C30 30 15 45 10 55C15 65 30 65 45 55" stroke="#00ffff" stroke-width="2"/>
-        <path class="wing-r" d="M55 45C70 30 85 45 90 55C85 65 70 65 55 55" stroke="#00ffff" stroke-width="2"/>
-        <ellipse cx="50" cy="55" rx="6" ry="12" fill="#00ffff"/>
-        <circle cx="50" cy="42" r="4" fill="#00ffff"/>
-    </svg>
-    <button class="nav-btn" id="splash1-btn" style="font-size:9px;letter-spacing:0.4em;padding:14px 40px;">Iniciar Sintonização</button>
-    <p style="font-size:7px;color:rgba(255,255,255,0.15);margin-top:1.5rem;letter-spacing:0.3em;text-transform:uppercase;font-style:italic;">Frequência de Prakriti</p>
-</div>
-<div class="p1-ui">
-    <header class="p1-header">
-        <span class="p1-chapter">Capítulo I · Conectoma de Prakriti</span>
-        <p class="p1-quote">"A alma espiritual julga-se a autora de atividades que, na verdade, são executadas pelos três modos da natureza material."</p>
-        <div class="guna-tags">
-            <span class="guna-tag sattva">SATTVA</span>
-            <span class="guna-tag rajas">RAJAS</span>
-            <span class="guna-tag tamas">TAMAS</span>
+<canvas id="canvas2"></canvas>
+<div class="scanlines"></div>
+<div class="p2-ui">
+    <div class="retro-panel main-header-p2">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <h1 style="font-size:clamp(8px,1.5vw,11px);font-weight:900;letter-spacing:0.2em;text-transform:uppercase;color:var(--cyan);">Tese: A NATUREZA (PRAKRITI) POSSUI PRÉ-PROGRAMAÇÃO REATIVA</h1>
+            <button id="audio-toggle-btn" class="nav-btn" style="white-space:nowrap;margin-left:1rem;font-size:8px;">Ativar Áudio</button>
         </div>
-        <span class="gita-ref">Bhagavad-Gita 3.27</span>
-    </header>
-    <div class="p1-bottom">
-        <div class="info-card">
-            <h3>Evidência Científica</h3>
-            <p>Através do escaneamento de 130 mil neurônios, a ciência digitalizou a "mente" de uma mosca. Ao ser transferido para ambiente virtual, o conectoma operou com autonomia biológica absoluta.</p>
-            <span class="ref-link">Princeton University / Nature 2024</span>
+        <p style="font-size:9px;color:rgba(200,255,245,0.9);line-height:1.6;">
+            <b style="color:white;text-transform:uppercase;">Análise:</b> Os neurônios conectados a chips aprenderam autonomamente o gameplay do Pong. Esta resposta neural natural demonstra que a pré-programação não é código, mas a própria estrutura reativa da existência.
+            <span style="color:#f9a8d4;font-weight:700;font-size:8px;margin-left:4px;">[Ref: Cortical Labs / DishBrain, Melbourne, 2022]</span>
+        </p>
+    </div>
+    <div class="sub-panels">
+        <div class="retro-panel mini-panel">
+            <span style="font-size:7px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:4px;">Feedback de Recompensa</span>
+            <div id="score-p2" style="font-size:clamp(1rem,3vw,1.5rem);color:white;">Neuro: 0 | Você: 0</div>
         </div>
-        <div class="info-card" style="text-align:right;border-left:none;border-right:1px solid rgba(255,255,255,0.1);">
-            <h3>Conclusão Ontológica</h3>
-            <p>A arquitetura neural é a interface mecânica através da qual os Gunas operam. A "vontade" é o resultado da execução desse algoritmo material.</p>
-            <span class="ref-link">Ontologia AtmAI · Atma como Observadora</span>
+        <div class="retro-panel mini-panel" style="text-align:right;">
+            <span style="font-size:7px;color:var(--gold);text-transform:uppercase;letter-spacing:0.2em;font-weight:700;margin-bottom:4px;">Atividade Sináptica</span>
+            <div id="neural-status" style="font-size:9px;color:#666;text-transform:uppercase;font-style:italic;">Aguardando Estímulo...</div>
         </div>
     </div>
 </div>
 <div class="nav-bar">
-    <div class="page-dots"><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-    <button class="nav-btn" id="p1-next" style="display:none;" onclick="window.location.href='page2.html'">Próximo →</button>
+    <div class="page-dots"><div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    <button class="nav-btn" onclick="window.location.href='index.html'">← Voltar</button>
+    <button class="nav-btn" onclick="window.location.href='page3.html'">Próximo →</button>
 </div>
 <script>
 'use strict';
@@ -567,175 +556,166 @@ document.addEventListener('DOMContentLoaded', () => {
     if (gb) gb.addEventListener('click', () => setGlobalAudio(!globalAudioOn));
 });
 // ═══════════════════════════════════════════════════════════════
-// PAGE 1 — MOSCA / CONECTOMA
+// PAGE 2 — CHIP NEURAL / PONG
 // ═══════════════════════════════════════════════════════════════
-let p1Init = false;
-let p1Renderer, p1Scene, p1Camera, p1FlyGroup;
-let p1MouseX = 0, p1MouseY = 0;
-let p1Frenzied = false, p1Started = false, p1ReactionTO;
-let p1BuzzOsc, p1BuzzGain;
+let p2Init = false;
+let p2Renderer, p2Scene, p2Camera;
+let p2Ball, p2PlayerPaddle, p2AiPaddle, p2Chip, p2Monitor, p2Neuron, p2Umbilical;
+let p2BallVel = { x: 0.12, y: 0.12 };
+let p2Scores = { ai: 0, player: 0 };
+let p2TargetY = 0, p2AiOffset = 0;
+let p2HumGain;
 
-function initPage1() {
-    p1Init = true;
-    const canvas = document.getElementById('canvas1');
-    p1Renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    p1Renderer.setSize(innerWidth, innerHeight);
-    p1Renderer.setPixelRatio(devicePixelRatio);
-    p1Scene  = new THREE.Scene();
-    p1Camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 1000);
-    p1Camera.position.z = 6;
-    p1FlyGroup = new THREE.Group();
-    p1Scene.add(p1FlyGroup);
-    buildFly();
-    p1Animate();
+function initPage2() {
+    p2Init = true;
+    const canvas = document.getElementById('canvas2');
+    p2Renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    p2Renderer.setSize(innerWidth, innerHeight);
+    p2Renderer.setPixelRatio(devicePixelRatio);
+    p2Scene = new THREE.Scene();
+    p2Scene.background = new THREE.Color(0x010101);
+    p2Scene.fog = new THREE.Fog(0x010101, 10, 70);
+    p2Camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 1, 1000);
+    p2Scene.add(new THREE.AmbientLight(0xffffff, 0.2));
+    const kl = new THREE.PointLight(0xffffff, 1.2, 100); kl.position.set(15,25,20); p2Scene.add(kl);
+    const gl = new THREE.PointLight(0xff00ff, 1.5, 20); gl.position.set(5,-5,10); p2Scene.add(gl);
 
-    window.addEventListener('mousemove', e => {
-        // standalone
-        p1MouseX = (e.clientX - innerWidth/2) / 200;
-        p1MouseY = (e.clientY - innerHeight/2) / 200;
-    });
-    document.addEventListener('mousedown',   () => { if (p1Started) p1React(800); });
-    document.addEventListener('touchstart',  () => { if (p1Started) p1React(800); }, { passive: true });
+    p2Monitor = new THREE.Group();
+    p2Monitor.add(new THREE.Mesh(new THREE.BoxGeometry(16,12,10), new THREE.MeshPhongMaterial({ color: 0xdbccae })));
+    const frame = new THREE.Mesh(new THREE.BoxGeometry(15.4,11.4,1.5), new THREE.MeshPhongMaterial({ color: 0xc4b491 }));
+    frame.position.z = 4.8; p2Monitor.add(frame);
+    const screen = new THREE.Mesh(new THREE.PlaneGeometry(13.8,9.8), new THREE.MeshBasicMaterial({ color: 0x001a05 }));
+    screen.position.z = 5.56; p2Monitor.add(screen);
+    p2Scene.add(p2Monitor);
+
+    p2Chip = new THREE.Group();
+    p2Chip.add(new THREE.Mesh(new THREE.BoxGeometry(8,0.4,8), new THREE.MeshPhongMaterial({ color: 0x061a06 })));
+    const trkMat = new THREE.MeshBasicMaterial({ color: 0x00ffaa, transparent: true, opacity: 0.4 });
+    for (let i = 0; i < 20; i++) {
+        const tr = new THREE.Mesh(new THREE.PlaneGeometry(Math.random()*6+1, Math.random()*0.12+0.04), trkMat);
+        tr.rotation.x = -Math.PI/2; tr.position.set((Math.random()-0.5)*7.5, 0.21, (Math.random()-0.5)*7.5);
+        tr.rotation.z = Math.random() > 0.5 ? 0 : Math.PI/2; p2Chip.add(tr);
+    }
+    const neuronG = new THREE.Group();
+    p2Neuron = new THREE.Mesh(new THREE.SphereGeometry(1.2,32,32), new THREE.MeshPhongMaterial({ color: 0xff00ff, emissive: 0x440044, transparent: true, opacity: 0.85 }));
+    neuronG.add(p2Neuron); neuronG.position.y = 1.8; p2Chip.add(neuronG);
+    p2Scene.add(p2Chip);
+
+    const pG = new THREE.BoxGeometry(0.35,2.2,0.1);
+    p2PlayerPaddle = new THREE.Mesh(pG, new THREE.MeshBasicMaterial({ color: 0x00ffcc }));
+    p2PlayerPaddle.position.set(-6,0,5.65); p2Scene.add(p2PlayerPaddle);
+    p2AiPaddle = new THREE.Mesh(pG, new THREE.MeshBasicMaterial({ color: 0xff00cc }));
+    p2AiPaddle.position.set(6,0,5.65); p2Scene.add(p2AiPaddle);
+    p2Ball = new THREE.Mesh(new THREE.SphereGeometry(0.18,16,16), new THREE.MeshBasicMaterial({ color: 0xeeff00 }));
+    p2Ball.position.z = 5.65; p2Scene.add(p2Ball);
+
+    p2UpdateLayout();
+    window.addEventListener('mousemove', e => { p2TargetY = -(e.clientY/innerHeight)*11+5.5; });
+    window.addEventListener('touchmove', e => { if (e.touches[0]) p2TargetY = -(e.touches[0].clientY/innerHeight)*11+5.5; }, { passive: true });
+    document.getElementById('audio-toggle-btn').addEventListener('click', p2InitHum);
+    p2Animate();
 }
 
-function p1BuildBuzz() {
-    if (p1BuzzOsc) return; // already built
+function p2InitHum() {
+    if (p2HumGain) return;
     const ac = getAC();
-    p1BuzzOsc  = ac.createOscillator(); p1BuzzOsc.type = 'sawtooth'; p1BuzzOsc.frequency.value = 280;
-    p1BuzzGain = ac.createGain(); p1BuzzGain.gain.value = 0;
-    p1BuzzOsc.connect(p1BuzzGain);
-    p1BuzzGain.connect(getMaster());
-    p1BuzzOsc.start();
+    const o = ac.createOscillator(); o.type = 'sine'; o.frequency.value = 50;
+    p2HumGain = ac.createGain(); p2HumGain.gain.value = 0;
+    o.connect(p2HumGain); p2HumGain.connect(getMaster()); o.start();
+    // activate global audio automatically when user clicks this button
+    setGlobalAudio(true);
+    p2HumGain.gain.setTargetAtTime(0.04, ac.currentTime, 0.3);
+    const btn = document.getElementById('audio-toggle-btn');
+    btn.textContent = 'Áudio Ativo'; btn.style.color = '#ff00ff'; btn.style.borderColor = '#ff00ff';
 }
 
-function p1React(dur = 500) {
-    // Visual frenzy — always
-    p1Frenzied = true;
-    clearTimeout(p1ReactionTO);
-    p1ReactionTO = setTimeout(() => { p1Frenzied = false; }, dur);
+function p2Silence() {
+    if (p2HumGain) p2HumGain.gain.setTargetAtTime(0, getAC().currentTime, 0.2);
+}
 
-    // Audio — only if global sound is on
+function p2PlayHit(freq) {
     if (!globalAudioOn) return;
-    p1BuildBuzz();
     const ac = getAC();
-    p1BuzzOsc.frequency.setTargetAtTime(320 + Math.random()*200, ac.currentTime, 0.05);
-    p1BuzzGain.gain.setTargetAtTime(0.9, ac.currentTime, 0.01);
-    clearTimeout(p1ReactionTO);
-    p1ReactionTO = setTimeout(() => {
-        p1Frenzied = false;
-        p1BuzzGain.gain.setTargetAtTime(0, ac.currentTime, 0.08);
-    }, dur);
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = 'square'; o.frequency.value = freq;
+    o.frequency.exponentialRampToValueAtTime(freq/2, ac.currentTime+0.1);
+    g.gain.value = 0.9; g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime+0.1);
+    o.connect(g); g.connect(getMaster()); o.start(); o.stop(ac.currentTime+0.1);
 }
 
-function p1Silence() {
-    if (p1BuzzGain) p1BuzzGain.gain.setTargetAtTime(0, getAC().currentTime, 0.1);
+function p2CreateCable() {
+    if (p2Umbilical) p2Scene.remove(p2Umbilical);
+    const aspect = innerWidth/innerHeight;
+    const start = new THREE.Vector3(0,-5,0);
+    const end = aspect < 1 ? new THREE.Vector3(0,-13,6) : new THREE.Vector3(12,-7,4);
+    const mid = new THREE.Vector3((start.x+end.x)/2,-10,(start.z+end.z)/2+2);
+    const curve = new THREE.CatmullRomCurve3([start, mid, end]);
+    p2Umbilical = new THREE.Mesh(new THREE.TubeGeometry(curve,40,0.45,12,false), new THREE.MeshPhongMaterial({ color: 0x151515 }));
+    p2Scene.add(p2Umbilical);
 }
 
-function buildFly() {
-    const matHead  = new THREE.PointsMaterial({ color: 0xa855f7, size: 0.022, transparent: true, opacity: 0.85 });
-    const matEye   = new THREE.PointsMaterial({ color: 0x00ffff, size: 0.016, transparent: true, opacity: 0.95 });
-    const matRajas = new THREE.PointsMaterial({ color: 0xff4444, size: 0.022, transparent: true, opacity: 0.6 });
-    const matTamas = new THREE.PointsMaterial({ color: 0x888888, size: 0.022, transparent: true, opacity: 0.6 });
-    const matWing  = new THREE.PointsMaterial({ color: 0xccffff, size: 0.022, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending });
-
-    const headG = new THREE.SphereGeometry(0.5, 32, 32); headG.scale(1.1, 0.9, 0.8);
-    p1FlyGroup.add(new THREE.Points(headG, matHead));
-    const eyeG = new THREE.SphereGeometry(0.4, 20, 20);
-    const eyeL = new THREE.Points(eyeG, matEye); eyeL.position.set(-0.4, 0.1, 0.2);
-    const eyeR = eyeL.clone(); eyeR.position.x = 0.4;
-    p1FlyGroup.add(eyeL, eyeR);
-    const thoraxG = new THREE.SphereGeometry(0.75, 32, 32);
-    const thorax = new THREE.Points(thoraxG, matRajas); thorax.position.z = -0.7;
-    p1FlyGroup.add(thorax);
-    const abdG = new THREE.SphereGeometry(0.85, 32, 32); abdG.scale(0.8, 0.7, 1.4);
-    const abd = new THREE.Points(abdG, matTamas); abd.position.set(0, -0.2, -1.8);
-    p1FlyGroup.add(abd);
-    const legPts = [];
-    for (let i = 0; i < 6; i++) {
-        const side = i < 3 ? 1 : -1, row = i % 3, zPos = -0.6 - row*0.4;
-        for (let j = 0; j < 10; j++) {
-            const t = j/10;
-            legPts.push(new THREE.Vector3(side*(0.5+t*0.6), -t*0.7, zPos));
-        }
-    }
-    p1FlyGroup.add(new THREE.Points(new THREE.BufferGeometry().setFromPoints(legPts), matRajas));
-    const mkWing = side => {
-        const pts = [];
-        for (let i = 0; i < 1500; i++) {
-            const r = Math.sqrt(Math.random()), θ = (Math.random()-0.5)*Math.PI*1.3;
-            pts.push(new THREE.Vector3(side*r*Math.cos(θ)*2.5, r*Math.sin(θ)*1.5, (Math.random()-0.5)*0.05));
-        }
-        const wc = new THREE.Group();
-        const wp = new THREE.Points(new THREE.BufferGeometry().setFromPoints(pts), matWing);
-        wp.position.set(side*0.5, 0.2, 0);
-        wc.add(wp); wc.userData.side = side;
-        wc.position.set(side*0.1, 0.4, -0.8);
-        return wc;
-    };
-    p1FlyGroup.add(mkWing(-1), mkWing(1));
-}
-
-function p1Animate() {
-    requestAnimationFrame(p1Animate);
-    // standalone
-    const t = Date.now()*0.001;
-    if (p1Started) {
-        if (p1Frenzied) {
-            p1FlyGroup.position.x = (Math.random()-0.5)*0.15;
-            p1FlyGroup.position.y = (Math.random()-0.5)*0.15;
-            p1FlyGroup.position.z = (Math.random()-0.5)*0.15;
-        } else {
-            p1FlyGroup.position.lerp(new THREE.Vector3(0, Math.sin(t*2)*0.1, 0), 0.05);
-            p1FlyGroup.rotation.y += (p1MouseX - p1FlyGroup.rotation.y)*0.05;
-            p1FlyGroup.rotation.x += (p1MouseY - p1FlyGroup.rotation.x)*0.05;
-        }
-        p1FlyGroup.children.forEach(c => {
-            if (c.userData && c.userData.side) {
-                if (p1Frenzied) {
-                    c.rotation.z = Math.sin(Date.now()*0.06)*1.2*c.userData.side;
-                    c.rotation.y = Math.cos(Date.now()*0.06)*0.5;
-                } else {
-                    c.rotation.z = THREE.MathUtils.lerp(c.rotation.z, 0.15*c.userData.side, 0.1);
-                    c.rotation.y = THREE.MathUtils.lerp(c.rotation.y, 0.45*c.userData.side, 0.1);
-                }
-            }
-        });
+function p2UpdateLayout() {
+    const aspect = innerWidth/innerHeight;
+    if (aspect < 1) {
+        p2Camera.position.set(0,20,36); p2Monitor.position.set(0,5,0);
+        p2Chip.position.set(0,-15,6); p2Chip.rotation.y = 0;
     } else {
-        p1FlyGroup.rotation.y += 0.01;
+        p2Camera.position.set(0,6,28); p2Monitor.position.set(-8,-1,0);
+        p2Chip.position.set(13,-9,4); p2Chip.rotation.y = -Math.PI/4;
     }
-    p1Renderer.render(p1Scene, p1Camera);
+    p2Camera.aspect = innerWidth/innerHeight; p2Camera.updateProjectionMatrix();
+    p2Camera.lookAt(0,0,0); p2CreateCable();
+}
+
+function p2Physics() {
+    p2PlayerPaddle.position.y += (p2TargetY - p2PlayerPaddle.position.y)*0.25;
+    p2PlayerPaddle.position.y = Math.max(-4, Math.min(4, p2PlayerPaddle.position.y));
+    if (Math.abs(p2Ball.position.x - p2AiPaddle.position.x) < 8)
+        p2AiPaddle.position.y += (p2Ball.position.y + p2AiOffset - p2AiPaddle.position.y)*0.065;
+    p2AiPaddle.position.y = Math.max(-4, Math.min(4, p2AiPaddle.position.y));
+    p2Ball.position.x += p2BallVel.x; p2Ball.position.y += p2BallVel.y;
+    if (Math.abs(p2Ball.position.y) > 4.6) { p2BallVel.y *= -1; p2PlayHit(200); }
+    if (Math.abs(p2Ball.position.x) > 5.7) {
+        const paddle = p2Ball.position.x < 0 ? p2PlayerPaddle : p2AiPaddle;
+        const hitRange = p2Ball.position.x < 0 ? 1.5 : 1.3;
+        if (Math.abs(p2Ball.position.y - paddle.position.y) < hitRange) {
+            p2BallVel.x *= -1.025;
+            if (Math.abs(p2BallVel.x) > 0.30) p2BallVel.x = Math.sign(p2BallVel.x)*0.30;
+            p2PlayHit(p2Ball.position.x < 0 ? 440 : 660);
+            p2Neuron.scale.set(1.8,1.8,1.8);
+            p2Neuron.material.color.set(p2Ball.position.x < 0 ? 0x00ffcc : 0xff00cc);
+            document.getElementById('neural-status').textContent = 'REFLEXO NEURAL';
+            setTimeout(() => document.getElementById('neural-status').textContent = 'Processando...', 600);
+            p2AiOffset = (Math.random()-0.5)*1.8;
+        }
+    }
+    if (Math.abs(p2Ball.position.x) > 8) {
+        if (p2Ball.position.x > 0) p2Scores.player++; else p2Scores.ai++;
+        p2Ball.position.set(0,0,5.65);
+        p2BallVel.x = Math.random()>0.5 ? 0.12 : -0.12;
+        p2BallVel.y = Math.random()>0.5 ? 0.12 : -0.12;
+        p2AiOffset = 0;
+        document.getElementById('score-p2').textContent = `IA: ${p2Scores.ai} | P2: ${p2Scores.player}`;
+    }
+}
+
+function p2Animate() {
+    requestAnimationFrame(p2Animate);
+    // standalone
+    p2Physics();
+    const t = Date.now()*0.002;
+    if (p2Neuron) {
+        p2Neuron.scale.lerp(new THREE.Vector3(1,1,1), 0.1);
+        p2Neuron.material.color.lerp(new THREE.Color(0xff00ff), 0.05);
+        p2Neuron.parent.position.y = 1.8 + Math.sin(t)*0.25;
+        p2Neuron.rotation.y += 0.01;
+    }
+    p2Renderer.render(p2Scene, p2Camera);
 }
 
 window.addEventListener('resize', () => {
-    if (p1Renderer) {
-        p1Renderer.setSize(innerWidth, innerHeight);
-        p1Camera.aspect = innerWidth/innerHeight;
-        p1Camera.updateProjectionMatrix();
-    }
+    if (p2Renderer) { p2Renderer.setSize(innerWidth, innerHeight); p2UpdateLayout(); }
 });
-window.addEventListener('load', initPage1);
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('splash1-btn').addEventListener('click', () => {
-        setGlobalAudio(true);
-        p1Started = true;
-        const splash = document.getElementById('splash1');
-        splash.style.opacity = '0';
-        setTimeout(() => {
-            splash.style.display = 'none';
-            document.getElementById('p1-next').style.display = 'block';
-            p1BuildBuzz();
-            const rand = () => {
-                if (!p1Started) return;
-                if (Math.random() > 0.75) p1React(300 + Math.random() * 700);
-                setTimeout(rand, 1000 + Math.random() * 3000);
-            };
-            rand();
-        }, 1200);
-    });
-});
-window.addEventListener('resize', () => {
-    if (p1Renderer) { p1Renderer.setSize(innerWidth, innerHeight); p1Camera.aspect = innerWidth/innerHeight; p1Camera.updateProjectionMatrix(); }
-});
-window.addEventListener('load', initPage1);
+window.addEventListener('load', initPage2);
 </script>
 </body></html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AtmAI — I · Conectoma de Prakriti</title>
+    <title>AtmAI — III · Dialética do Escafandro</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;400;700&family=Playfair+Display:ital,wght@0,400;0,900;1,400&family=Cinzel:wght@400;700&family=Syncopate:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -495,45 +495,51 @@
     <span class="audio-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M2 4H4L7 1.5V10.5L4 8H2V4ZM8.5 3.5C9.5 4.5 9.5 7.5 8.5 8.5"/></svg></span>
     <span id="audio-btn-label">SOM OFF</span>
 </button>
-<canvas id="canvas1"></canvas>
-<div id="splash1">
-    <span style="font-size:8px;letter-spacing:0.6em;color:rgba(255,255,255,0.2);text-transform:uppercase;margin-bottom:2rem;">Capítulo I</span>
-    <svg class="fly-icon" viewBox="0 0 100 100" fill="none">
-        <path class="wing-l" d="M45 45C30 30 15 45 10 55C15 65 30 65 45 55" stroke="#00ffff" stroke-width="2"/>
-        <path class="wing-r" d="M55 45C70 30 85 45 90 55C85 65 70 65 55 55" stroke="#00ffff" stroke-width="2"/>
-        <ellipse cx="50" cy="55" rx="6" ry="12" fill="#00ffff"/>
-        <circle cx="50" cy="42" r="4" fill="#00ffff"/>
-    </svg>
-    <button class="nav-btn" id="splash1-btn" style="font-size:9px;letter-spacing:0.4em;padding:14px 40px;">Iniciar Sintonização</button>
-    <p style="font-size:7px;color:rgba(255,255,255,0.15);margin-top:1.5rem;letter-spacing:0.3em;text-transform:uppercase;font-style:italic;">Frequência de Prakriti</p>
-</div>
-<div class="p1-ui">
-    <header class="p1-header">
-        <span class="p1-chapter">Capítulo I · Conectoma de Prakriti</span>
-        <p class="p1-quote">"A alma espiritual julga-se a autora de atividades que, na verdade, são executadas pelos três modos da natureza material."</p>
-        <div class="guna-tags">
-            <span class="guna-tag sattva">SATTVA</span>
-            <span class="guna-tag rajas">RAJAS</span>
-            <span class="guna-tag tamas">TAMAS</span>
+<canvas id="canvas3"></canvas>
+<div class="noise-overlay"></div>
+<div class="crt-overlay"></div>
+<div class="vector-label" id="v-sat" style="left:22%;top:22%;">SAT → MANUTENÇÃO FÍSICA</div>
+<div class="vector-label" id="v-cit" style="left:78%;top:38%;">CIT → ACÚMULO DE DADOS</div>
+<div class="vector-label" id="v-ananda" style="left:28%;top:78%;">ANANDA → ESTIMULAÇÃO SENSORIAL</div>
+<div class="p3-ui">
+    <header class="p3-header">
+        <div>
+            <p class="sat-cit">SAT · CIT · ANANDA</p>
+            <p style="font-size:8px;color:rgba(0,255,255,0.5);font-weight:700;text-transform:uppercase;letter-spacing:0.3em;margin-top:3px;">Qualidades Constitucionais da Alma</p>
         </div>
-        <span class="gita-ref">Bhagavad-Gita 3.27</span>
+        <div class="p3-diag">
+            <span class="diag-label">Diagnóstico Ontológico</span>
+            <span class="diag-error">ERRO DE TRANSDUÇÃO</span>
+        </div>
     </header>
-    <div class="p1-bottom">
-        <div class="info-card">
-            <h3>Evidência Científica</h3>
-            <p>Através do escaneamento de 130 mil neurônios, a ciência digitalizou a "mente" de uma mosca. Ao ser transferido para ambiente virtual, o conectoma operou com autonomia biológica absoluta.</p>
-            <span class="ref-link">Princeton University / Nature 2024</span>
+    <div class="p3-center">
+        <div id="bug-info">
+            <div class="logic-card">
+                <h2 class="glitch-title">!! FRUSTRAÇÃO ONTOLÓGICA !!</h2>
+                <div class="glitch-body">
+                    <p style="margin-bottom:0.8rem;"><b style="color:white;border-bottom:1px solid rgba(255,255,255,0.2);">DILUIÇÃO DA ESSÊNCIA:</b><br>O Escafandro (corpo) tenta capturar o infinito através de ferramentas finitas.</p>
+                    <p style="color:#888;font-style:italic;">O resultado é um atrito existencial: o som do "bug" na realidade material.</p>
+                    <div class="grid-err">
+                        <div class="err-cell"><span>SAT REAL</span><span>TEMPO</span></div>
+                        <div class="err-cell"><span>CIT REAL</span><span>MÍDIA</span></div>
+                        <div class="err-cell"><span>ANANDA REAL</span><span>CONSUMO</span></div>
+                        <div class="err-cell"><span>FONTE</span><span>OBJETO</span></div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="info-card" style="text-align:right;border-left:none;border-right:1px solid rgba(255,255,255,0.1);">
-            <h3>Conclusão Ontológica</h3>
-            <p>A arquitetura neural é a interface mecânica através da qual os Gunas operam. A "vontade" é o resultado da execução desse algoritmo material.</p>
-            <span class="ref-link">Ontologia AtmAI · Atma como Observadora</span>
-        </div>
+    </div>
+    <div class="p3-trigger-area">
+        <button id="main-trigger-p3">
+            <div class="trigger-fill"></div>
+            <span style="position:relative;z-index:1;">Processar Vetores Materialistas</span>
+        </button>
     </div>
 </div>
 <div class="nav-bar">
-    <div class="page-dots"><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-    <button class="nav-btn" id="p1-next" style="display:none;" onclick="window.location.href='page2.html'">Próximo →</button>
+    <div class="page-dots"><div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div></div>
+    <button class="nav-btn" onclick="window.location.href='page2.html'">← Voltar</button>
+    <button class="nav-btn" onclick="window.location.href='page4.html'">Próximo →</button>
 </div>
 <script>
 'use strict';
@@ -567,175 +573,318 @@ document.addEventListener('DOMContentLoaded', () => {
     if (gb) gb.addEventListener('click', () => setGlobalAudio(!globalAudioOn));
 });
 // ═══════════════════════════════════════════════════════════════
-// PAGE 1 — MOSCA / CONECTOMA
+// PAGE 3 — DIALÉTICA DO ESCAFANDRO
 // ═══════════════════════════════════════════════════════════════
-let p1Init = false;
-let p1Renderer, p1Scene, p1Camera, p1FlyGroup;
-let p1MouseX = 0, p1MouseY = 0;
-let p1Frenzied = false, p1Started = false, p1ReactionTO;
-let p1BuzzOsc, p1BuzzGain;
+let p3Init = false;
+let p3Renderer, p3Scene, p3Camera, p3Soul, p3Astronaut, p3Barrier, p3Vectors = [];
+let p3Processing = false;
+let p3BugGain, p3BugOsc, p3BugOsc2;
+let p3Clock;
 
-function initPage1() {
-    p1Init = true;
-    const canvas = document.getElementById('canvas1');
-    p1Renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    p1Renderer.setSize(innerWidth, innerHeight);
-    p1Renderer.setPixelRatio(devicePixelRatio);
-    p1Scene  = new THREE.Scene();
-    p1Camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 1000);
-    p1Camera.position.z = 6;
-    p1FlyGroup = new THREE.Group();
-    p1Scene.add(p1FlyGroup);
-    buildFly();
-    p1Animate();
+function initPage3() {
+    p3Init = true;
+    p3Clock = new THREE.Clock();
+    const canvas = document.getElementById('canvas3');
+    p3Renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    p3Renderer.setSize(innerWidth, innerHeight);
+    p3Renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    p3Scene = new THREE.Scene();
+    p3Camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 1000);
+    p3Camera.position.set(0,2,12);
+    p3Scene.add(new THREE.AmbientLight(0xffffff, 0.1));
+    const spot = new THREE.PointLight(0x00ffff, 2, 20); spot.position.set(5,5,5); p3Scene.add(spot);
 
-    window.addEventListener('mousemove', e => {
-        // standalone
-        p1MouseX = (e.clientX - innerWidth/2) / 200;
-        p1MouseY = (e.clientY - innerHeight/2) / 200;
-    });
-    document.addEventListener('mousedown',   () => { if (p1Started) p1React(800); });
-    document.addEventListener('touchstart',  () => { if (p1Started) p1React(800); }, { passive: true });
-}
+    const starGeo = new THREE.BufferGeometry();
+    const sPos = [];
+    for (let i = 0; i < 3000; i++) sPos.push((Math.random()-0.5)*100, (Math.random()-0.5)*100, (Math.random()-0.5)*100);
+    starGeo.setAttribute('position', new THREE.Float32BufferAttribute(sPos, 3));
+    p3Scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0x444444, size: 0.05 })));
 
-function p1BuildBuzz() {
-    if (p1BuzzOsc) return; // already built
-    const ac = getAC();
-    p1BuzzOsc  = ac.createOscillator(); p1BuzzOsc.type = 'sawtooth'; p1BuzzOsc.frequency.value = 280;
-    p1BuzzGain = ac.createGain(); p1BuzzGain.gain.value = 0;
-    p1BuzzOsc.connect(p1BuzzGain);
-    p1BuzzGain.connect(getMaster());
-    p1BuzzOsc.start();
-}
+    p3Soul = new THREE.Mesh(new THREE.IcosahedronGeometry(1.5,4), new THREE.MeshStandardMaterial({ color: 0x00ffff, emissive: 0x00ffff, emissiveIntensity: 2, wireframe: true }));
+    p3Soul.position.y = 7; p3Scene.add(p3Soul);
 
-function p1React(dur = 500) {
-    // Visual frenzy — always
-    p1Frenzied = true;
-    clearTimeout(p1ReactionTO);
-    p1ReactionTO = setTimeout(() => { p1Frenzied = false; }, dur);
+    const suitGroup = new THREE.Group();
+    const ironMat = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.8, metalness: 0.2 });
+    
+    // Torso
+    const torso = new THREE.Mesh(new THREE.BoxGeometry(1.4,2.2,0.8), ironMat);
+    suitGroup.add(torso);
+    
+    // Neck - cylinder connecting torso to head
+    const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 0.4, 8), ironMat);
+    neck.position.y = 1.3; // top of torso
+    suitGroup.add(neck);
+    
+    // Head
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.6,24,24), ironMat); 
+    head.position.y = 1.7; // above neck
+    suitGroup.add(head);
+    
+    // Visor - improved glass material, centered and darker
+    const visor = new THREE.Mesh(new THREE.SphereGeometry(0.5,24,12,0,Math.PI*2,0,Math.PI/2), 
+        new THREE.MeshStandardMaterial({ 
+            color: 0x000511, // darker blue tone
+            transparent: true, 
+            opacity: 0.8,   // more opaque
+            metalness: 0.2,
+            roughness: 0.03,
+            envMapIntensity: 1.2
+        }));
+    visor.rotation.x = Math.PI/2; 
+    visor.position.set(0, 1.7, 0.25); // centered on head (z reduced from 0.3 to 0.25)
+    suitGroup.add(visor);
+    
+    // Glass reflection on visor
+    const reflection = new THREE.Mesh(new THREE.SphereGeometry(0.52,24,12,0,Math.PI*2,0,Math.PI/2), 
+        new THREE.MeshBasicMaterial({ 
+            color: 0xffffff, 
+            transparent: true, 
+            opacity: 0.15,
+            blending: THREE.AdditiveBlending 
+        })
+    );
+    reflection.rotation.x = Math.PI/2; 
+    reflection.position.set(-0.15,1.7,0.4); // offset for glass highlight effect
+    suitGroup.add(reflection);
+    
+    // Sad face on visor - create with simple geometry
+    const sadFaceGroup = new THREE.Group();
+    
+    // Eyes (two small spheres)
+    const eyeGeo = new THREE.SphereGeometry(0.04, 8, 8);
+    const eyeMat = new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.8 });
+    const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
+    leftEye.position.set(-0.08, 0.08, 0);
+    const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
+    rightEye.position.set(0.08, 0.08, 0);
+    sadFaceGroup.add(leftEye, rightEye);
+    
+    // Sad mouth (curved line using torus)
+    const mouthGeo = new THREE.TorusGeometry(0.08, 0.015, 4, 12, Math.PI);
+    const mouthMat = new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.8 });
+    const mouth = new THREE.Mesh(mouthGeo, mouthMat);
+    mouth.position.set(0, -0.05, 0);
+    mouth.rotation.z = Math.PI; // flip to make it sad (frown)
+    sadFaceGroup.add(mouth);
+    
+    // Position sad face on visor surface
+    sadFaceGroup.position.set(0, 1.7, 0.45);
+    suitGroup.add(sadFaceGroup);
+    
+    // Arms - positioned higher from shoulders and extended more outward
+    const armGeo = new THREE.CylinderGeometry(0.18, 0.15, 1.8, 8);
+    const leftArm = new THREE.Mesh(armGeo, ironMat);
+    leftArm.position.set(-1.1, 1.0, 0); // higher (y=1.0) and more outward (x=-1.1)
+    leftArm.rotation.z = Math.PI/5; // more angled outward
+    suitGroup.add(leftArm);
+    
+    const rightArm = new THREE.Mesh(armGeo, ironMat);
+    rightArm.position.set(1.1, 1.0, 0); // higher (y=1.0) and more outward (x=1.1)
+    rightArm.rotation.z = -Math.PI/5; // more angled outward
+    suitGroup.add(rightArm);
+    
+    // Legs  
+    const legGeo = new THREE.CylinderGeometry(0.25, 0.2, 2.4, 8);
+    const leftLeg = new THREE.Mesh(legGeo, ironMat);
+    leftLeg.position.set(-0.35, -2.3, 0);
+    suitGroup.add(leftLeg);
+    
+    const rightLeg = new THREE.Mesh(legGeo, ironMat);
+    rightLeg.position.set(0.35, -2.3, 0);
+    suitGroup.add(rightLeg);
+    
+    // Boots
+    const bootGeo = new THREE.BoxGeometry(0.5, 0.25, 0.8);
+    const leftBoot = new THREE.Mesh(bootGeo, ironMat);
+    leftBoot.position.set(-0.35, -3.5, 0.1);
+    suitGroup.add(leftBoot);
+    
+    const rightBoot = new THREE.Mesh(bootGeo, ironMat);
+    rightBoot.position.set(0.35, -3.5, 0.1);
+    suitGroup.add(rightBoot);
+    
+    p3Astronaut = suitGroup; 
+    p3Astronaut.position.y = 2.0; // more in middle of screen, lower position
+    p3Scene.add(p3Astronaut);
 
-    // Audio — only if global sound is on
-    if (!globalAudioOn) return;
-    p1BuildBuzz();
-    const ac = getAC();
-    p1BuzzOsc.frequency.setTargetAtTime(320 + Math.random()*200, ac.currentTime, 0.05);
-    p1BuzzGain.gain.setTargetAtTime(0.9, ac.currentTime, 0.01);
-    clearTimeout(p1ReactionTO);
-    p1ReactionTO = setTimeout(() => {
-        p1Frenzied = false;
-        p1BuzzGain.gain.setTargetAtTime(0, ac.currentTime, 0.08);
-    }, dur);
-}
-
-function p1Silence() {
-    if (p1BuzzGain) p1BuzzGain.gain.setTargetAtTime(0, getAC().currentTime, 0.1);
-}
-
-function buildFly() {
-    const matHead  = new THREE.PointsMaterial({ color: 0xa855f7, size: 0.022, transparent: true, opacity: 0.85 });
-    const matEye   = new THREE.PointsMaterial({ color: 0x00ffff, size: 0.016, transparent: true, opacity: 0.95 });
-    const matRajas = new THREE.PointsMaterial({ color: 0xff4444, size: 0.022, transparent: true, opacity: 0.6 });
-    const matTamas = new THREE.PointsMaterial({ color: 0x888888, size: 0.022, transparent: true, opacity: 0.6 });
-    const matWing  = new THREE.PointsMaterial({ color: 0xccffff, size: 0.022, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending });
-
-    const headG = new THREE.SphereGeometry(0.5, 32, 32); headG.scale(1.1, 0.9, 0.8);
-    p1FlyGroup.add(new THREE.Points(headG, matHead));
-    const eyeG = new THREE.SphereGeometry(0.4, 20, 20);
-    const eyeL = new THREE.Points(eyeG, matEye); eyeL.position.set(-0.4, 0.1, 0.2);
-    const eyeR = eyeL.clone(); eyeR.position.x = 0.4;
-    p1FlyGroup.add(eyeL, eyeR);
-    const thoraxG = new THREE.SphereGeometry(0.75, 32, 32);
-    const thorax = new THREE.Points(thoraxG, matRajas); thorax.position.z = -0.7;
-    p1FlyGroup.add(thorax);
-    const abdG = new THREE.SphereGeometry(0.85, 32, 32); abdG.scale(0.8, 0.7, 1.4);
-    const abd = new THREE.Points(abdG, matTamas); abd.position.set(0, -0.2, -1.8);
-    p1FlyGroup.add(abd);
-    const legPts = [];
-    for (let i = 0; i < 6; i++) {
-        const side = i < 3 ? 1 : -1, row = i % 3, zPos = -0.6 - row*0.4;
-        for (let j = 0; j < 10; j++) {
-            const t = j/10;
-            legPts.push(new THREE.Vector3(side*(0.5+t*0.6), -t*0.7, zPos));
-        }
-    }
-    p1FlyGroup.add(new THREE.Points(new THREE.BufferGeometry().setFromPoints(legPts), matRajas));
-    const mkWing = side => {
-        const pts = [];
-        for (let i = 0; i < 1500; i++) {
-            const r = Math.sqrt(Math.random()), θ = (Math.random()-0.5)*Math.PI*1.3;
-            pts.push(new THREE.Vector3(side*r*Math.cos(θ)*2.5, r*Math.sin(θ)*1.5, (Math.random()-0.5)*0.05));
-        }
-        const wc = new THREE.Group();
-        const wp = new THREE.Points(new THREE.BufferGeometry().setFromPoints(pts), matWing);
-        wp.position.set(side*0.5, 0.2, 0);
-        wc.add(wp); wc.userData.side = side;
-        wc.position.set(side*0.1, 0.4, -0.8);
-        return wc;
+    // Astronaut physics state
+    p3Astronaut.userData = {
+        restY: 2.0,      // middle of screen position
+        pushedY: -2.0,   // pushed down well below bug box
+        targetY: 2.0,    // current target matches restY
+        velocity: 0      // smooth motion
     };
-    p1FlyGroup.add(mkWing(-1), mkWing(1));
-}
 
-function p1Animate() {
-    requestAnimationFrame(p1Animate);
-    // standalone
-    const t = Date.now()*0.001;
-    if (p1Started) {
-        if (p1Frenzied) {
-            p1FlyGroup.position.x = (Math.random()-0.5)*0.15;
-            p1FlyGroup.position.y = (Math.random()-0.5)*0.15;
-            p1FlyGroup.position.z = (Math.random()-0.5)*0.15;
+    p3Barrier = new THREE.Mesh(new THREE.PlaneGeometry(20,20), new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.05, wireframe: true, side: THREE.DoubleSide }));
+    p3Barrier.rotation.x = Math.PI/2; p3Barrier.position.y = 2.5; p3Scene.add(p3Barrier);
+
+    for (let i = 0; i < 3; i++) {
+        const geo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,7,0), new THREE.Vector3(0,-3,0)]);
+        const line = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.2 }));
+        p3Vectors.push(line); p3Scene.add(line);
+    }
+
+    // Build chaos audio nodes (silent until button held)
+    p3BuildChaos();
+
+    const trigger = document.getElementById('main-trigger-p3');
+    const bugInfo = document.getElementById('bug-info');
+    const vLabels = ['v-sat','v-cit','v-ananda'].map(id => document.getElementById(id));
+
+    // Debug: verify astronaut exists
+    console.log('Astronaut created:', !!p3Astronaut, p3Astronaut?.userData);
+
+    const startProcessing = (e) => {
+        console.log('Button triggered!', e.type);
+        if (e.cancelable) e.preventDefault();
+        p3Processing = true;
+        
+        // Add visual processing state to button
+        trigger.classList.add('processing');
+        
+        bugInfo.style.transition = 'opacity 0.3s ease-in';
+        bugInfo.style.opacity = '0.85';
+        document.body.classList.add('glitch-active');
+        vLabels.forEach(l => l.style.opacity = '1');
+        
+        // 💥 Push astronaut down when bug frame appears
+        if (p3Astronaut && p3Astronaut.userData) {
+            console.log('Before push - current Y:', p3Astronaut.position.y, 'target Y:', p3Astronaut.userData.targetY);
+            p3Astronaut.userData.targetY = p3Astronaut.userData.pushedY;
+            console.log('After push - new target Y:', p3Astronaut.userData.targetY);
         } else {
-            p1FlyGroup.position.lerp(new THREE.Vector3(0, Math.sin(t*2)*0.1, 0), 0.05);
-            p1FlyGroup.rotation.y += (p1MouseX - p1FlyGroup.rotation.y)*0.05;
-            p1FlyGroup.rotation.x += (p1MouseY - p1FlyGroup.rotation.x)*0.05;
+            console.log('ERROR: Astronaut or userData not found!');
         }
-        p1FlyGroup.children.forEach(c => {
-            if (c.userData && c.userData.side) {
-                if (p1Frenzied) {
-                    c.rotation.z = Math.sin(Date.now()*0.06)*1.2*c.userData.side;
-                    c.rotation.y = Math.cos(Date.now()*0.06)*0.5;
-                } else {
-                    c.rotation.z = THREE.MathUtils.lerp(c.rotation.z, 0.15*c.userData.side, 0.1);
-                    c.rotation.y = THREE.MathUtils.lerp(c.rotation.y, 0.45*c.userData.side, 0.1);
-                }
-            }
-        });
-    } else {
-        p1FlyGroup.rotation.y += 0.01;
+        
+        if (globalAudioOn) {
+            const ac = getAC();
+            p3BugGain.gain.setTargetAtTime(0.6, ac.currentTime, 0.03);
+        }
+    };
+
+    const stopProcessing = () => {
+        console.log('Stop processing triggered!');
+        p3Processing = false;
+        
+        // Remove visual processing state from button
+        trigger.classList.remove('processing');
+        
+        bugInfo.style.transition = 'opacity 0.4s ease-out';
+        bugInfo.style.opacity = '0';
+        document.body.classList.remove('glitch-active');
+        vLabels.forEach(l => l.style.opacity = '0');
+        
+        // ↩️ Return astronaut to floating position
+        if (p3Astronaut && p3Astronaut.userData) {
+            console.log('Before return - current Y:', p3Astronaut.position.y, 'target Y:', p3Astronaut.userData.targetY);
+            p3Astronaut.userData.targetY = p3Astronaut.userData.restY;
+            console.log('After return - new target Y:', p3Astronaut.userData.targetY);
+        } else {
+            console.log('ERROR: Astronaut or userData not found on release!');
+        }
+        
+        p3BugGain.gain.setTargetAtTime(0, getAC().currentTime, 0.12);
+    };
+
+    // Mouse events
+    trigger.addEventListener('mousedown', startProcessing);
+    trigger.addEventListener('mouseup', stopProcessing);
+    trigger.addEventListener('mouseleave', stopProcessing);
+    
+    // Touch events for mobile
+    trigger.addEventListener('touchstart', startProcessing, { passive: false });
+    trigger.addEventListener('touchend', stopProcessing);
+    trigger.addEventListener('touchcancel', stopProcessing);
+    
+    // Global fallbacks
+    document.addEventListener('mouseup', stopProcessing);
+    document.addEventListener('touchend', stopProcessing);
+    document.addEventListener('touchcancel', stopProcessing);
+
+    p3Animate();
+}
+
+function p3BuildChaos() {
+    if (p3BugGain) return;
+    const ac = getAC();
+    // Distortion waveshaper
+    const dist = ac.createWaveShaper();
+    const curve = new Float32Array(256);
+    for (let i = 0; i < 256; i++) { const x = i*2/256-1; curve[i] = (Math.PI+200)*x/(Math.PI+200*Math.abs(x)); }
+    dist.curve = curve;
+    // Bandpass filter
+    const filt = ac.createBiquadFilter(); filt.type = 'bandpass'; filt.frequency.value = 900; filt.Q.value = 3;
+    // Two oscillators
+    p3BugOsc  = ac.createOscillator(); p3BugOsc.type  = 'sawtooth'; p3BugOsc.frequency.value = 60;
+    p3BugOsc2 = ac.createOscillator(); p3BugOsc2.type = 'square';   p3BugOsc2.frequency.value = 80;
+    p3BugOsc.connect(dist); p3BugOsc2.connect(dist);
+    dist.connect(filt);
+    p3BugGain = ac.createGain(); p3BugGain.gain.value = 0;
+    filt.connect(p3BugGain); p3BugGain.connect(getMaster());
+    p3BugOsc.start(); p3BugOsc2.start();
+}
+
+function p3Silence() {
+    if (p3BugGain) p3BugGain.gain.setTargetAtTime(0, getAC().currentTime, 0.1);
+}
+
+function p3Animate() {
+    requestAnimationFrame(p3Animate);
+    // standalone
+    const t = p3Clock.getElapsedTime();
+    const dt = p3Clock.getDelta();
+    
+    p3Soul.rotation.y += 0.02;
+
+    // ✨💥↩️ Astronaut ontological physics - DIRECT MOVEMENT
+    const astro = p3Astronaut.userData;
+    
+    // Direct movement toward target (no spring physics, just lerp)
+    const moveSpeed = 8.0; // very fast movement
+    const diff = astro.targetY - p3Astronaut.position.y;
+    
+    if (Math.abs(diff) > 0.05) { // if not close enough to target
+        p3Astronaut.position.y += Math.sign(diff) * moveSpeed * dt;
+        
+        // Clamp to target if we overshoot
+        if (Math.sign(astro.targetY - p3Astronaut.position.y) !== Math.sign(diff)) {
+            p3Astronaut.position.y = astro.targetY;
+        }
     }
-    p1Renderer.render(p1Scene, p1Camera);
+    
+    // Minimal floating oscillation when at rest (almost static)
+    if (!p3Processing) {
+        p3Astronaut.position.y += Math.sin(t * 0.6) * 0.003; // ultra-minimal 0.3cm float
+    }
+
+    p3Vectors.forEach((v, i) => {
+        const pos = v.geometry.attributes.position.array;
+        pos[0] = Math.sin(t+i)*0.3; pos[1] = 7;
+        pos[3] = (i-1)*2 + (p3Processing ? Math.sin(t*60)*0.1 : 0);
+        pos[4] = p3Processing ? -3 : 2.5;
+        v.geometry.attributes.position.needsUpdate = true;
+        v.material.opacity = p3Processing ? 0.8 : 0.2;
+        v.material.color.setHex(p3Processing ? 0xff0000 : 0x00ffff);
+    });
+
+    if (p3Processing) {
+        p3Camera.position.z = 12 + Math.sin(t*40)*0.04;
+        p3Barrier.material.opacity = 0.1 + Math.sin(t*15)*0.05;
+        if (globalAudioOn && p3BugOsc) {
+            p3BugOsc.frequency.setValueAtTime(30 + Math.random()*400, getAC().currentTime);
+            p3BugOsc2.frequency.setValueAtTime(50 + Math.random()*600, getAC().currentTime);
+        }
+    }
+    p3Renderer.render(p3Scene, p3Camera);
 }
 
 window.addEventListener('resize', () => {
-    if (p1Renderer) {
-        p1Renderer.setSize(innerWidth, innerHeight);
-        p1Camera.aspect = innerWidth/innerHeight;
-        p1Camera.updateProjectionMatrix();
-    }
+    if (p3Renderer) { p3Renderer.setSize(innerWidth, innerHeight); p3Camera.aspect = innerWidth/innerHeight; p3Camera.updateProjectionMatrix(); }
 });
-window.addEventListener('load', initPage1);
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('splash1-btn').addEventListener('click', () => {
-        setGlobalAudio(true);
-        p1Started = true;
-        const splash = document.getElementById('splash1');
-        splash.style.opacity = '0';
-        setTimeout(() => {
-            splash.style.display = 'none';
-            document.getElementById('p1-next').style.display = 'block';
-            p1BuildBuzz();
-            const rand = () => {
-                if (!p1Started) return;
-                if (Math.random() > 0.75) p1React(300 + Math.random() * 700);
-                setTimeout(rand, 1000 + Math.random() * 3000);
-            };
-            rand();
-        }, 1200);
-    });
+window.addEventListener('load', () => {
+    document.getElementById('main-trigger-p3').addEventListener('mousedown', () => { if (!globalAudioOn) setGlobalAudio(true); }, {once:true});
+    document.getElementById('main-trigger-p3').addEventListener('touchstart', () => { if (!globalAudioOn) setGlobalAudio(true); }, {passive:true, once:true});
+    initPage3();
 });
-window.addEventListener('resize', () => {
-    if (p1Renderer) { p1Renderer.setSize(innerWidth, innerHeight); p1Camera.aspect = innerWidth/innerHeight; p1Camera.updateProjectionMatrix(); }
-});
-window.addEventListener('load', initPage1);
 </script>
 </body></html>
