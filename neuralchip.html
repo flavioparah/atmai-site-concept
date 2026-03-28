@@ -499,13 +499,12 @@
 <div class="scanlines"></div>
 <div class="p2-ui">
     <div class="retro-panel main-header-p2">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-            <h1 style="font-size:clamp(8px,1.5vw,11px);font-weight:900;letter-spacing:0.2em;text-transform:uppercase;color:var(--cyan);">Tese: A NATUREZA (PRAKRITI) POSSUI PRÉ-PROGRAMAÇÃO REATIVA</h1>
-            <button id="audio-toggle-btn" class="nav-btn" style="white-space:nowrap;margin-left:1rem;font-size:8px;">Ativar Áudio</button>
+        <div style="margin-bottom:6px;">
+            <h1 style="font-size:clamp(12px,2vw,16px);font-weight:900;letter-spacing:0.2em;text-transform:uppercase;color:var(--cyan);">Tese: A NATUREZA (PRAKRITI)<br>POSSUI PRÉ-PROGRAMAÇÃO REATIVA</h1>
         </div>
-        <p style="font-size:9px;color:rgba(200,255,245,0.9);line-height:1.6;">
+        <p style="font-size:12px;color:rgba(200,255,245,0.9);line-height:1.7;">
             <b style="color:white;text-transform:uppercase;">Análise:</b> Os neurônios conectados a chips aprenderam autonomamente o gameplay do Pong. Esta resposta neural natural demonstra que a pré-programação não é código, mas a própria estrutura reativa da existência.
-            <span style="color:#f9a8d4;font-weight:700;font-size:8px;margin-left:4px;">[Ref: Cortical Labs / DishBrain, Melbourne, 2022]</span>
+            <span style="color:#f9a8d4;font-weight:700;font-size:10px;margin-left:4px;">[Ref: Cortical Labs / DishBrain, Melbourne, 2022]</span>
         </p>
     </div>
     <div class="sub-panels">
@@ -519,11 +518,7 @@
         </div>
     </div>
 </div>
-<div class="nav-bar">
-    <div class="page-dots"><div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-    <button class="nav-btn" onclick="window.location.href='index.html'">← Voltar</button>
-    <button class="nav-btn" onclick="window.location.href='escafandro.html'">Próximo →</button>
-</div>
+<div style="width:5px;height:5px;border-radius:50%;background:#00ffff;box-shadow:0 0 8px #00ffff;"></div><div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);"></div><div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);"></div><div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);"></div><div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);"></div><div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);"></div></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
 <script>
 'use strict';
 let globalAudioOn = false;
@@ -612,7 +607,7 @@ function initPage2() {
     p2UpdateLayout();
     window.addEventListener('mousemove', e => { p2TargetY = -(e.clientY/innerHeight)*11+5.5; });
     window.addEventListener('touchmove', e => { if (e.touches[0]) p2TargetY = -(e.touches[0].clientY/innerHeight)*11+5.5; }, { passive: true });
-    document.getElementById('audio-toggle-btn').addEventListener('click', p2InitHum);
+    // audio auto-starts; global SOM btn controls it
     p2Animate();
 }
 
@@ -626,7 +621,7 @@ function p2InitHum() {
     setGlobalAudio(true);
     p2HumGain.gain.setTargetAtTime(0.04, ac.currentTime, 0.3);
     const btn = document.getElementById('audio-toggle-btn');
-    btn.textContent = 'Áudio Ativo'; btn.style.color = '#ff00ff'; btn.style.borderColor = '#ff00ff';
+    if (btn) { btn.textContent = 'Áudio Ativo'; btn.style.color = '#ff00ff'; btn.style.borderColor = '#ff00ff'; }
 }
 
 function p2Silence() {
@@ -657,10 +652,10 @@ function p2CreateCable() {
 function p2UpdateLayout() {
     const aspect = innerWidth/innerHeight;
     if (aspect < 1) {
-        p2Camera.position.set(0,20,36); p2Monitor.position.set(0,5,0);
+        p2Camera.position.set(0,20,36); p2Monitor.position.set(0,-1.3,0);
         p2Chip.position.set(0,-15,6); p2Chip.rotation.y = 0;
     } else {
-        p2Camera.position.set(0,6,28); p2Monitor.position.set(-8,-1,0);
+        p2Camera.position.set(0,6,28); p2Monitor.position.set(-8,-7.1,0);
         p2Chip.position.set(13,-9,4); p2Chip.rotation.y = -Math.PI/4;
     }
     p2Camera.aspect = innerWidth/innerHeight; p2Camera.updateProjectionMatrix();
@@ -695,7 +690,7 @@ function p2Physics() {
         p2BallVel.x = Math.random()>0.5 ? 0.12 : -0.12;
         p2BallVel.y = Math.random()>0.5 ? 0.12 : -0.12;
         p2AiOffset = 0;
-        document.getElementById('score-p2').textContent = `IA: ${p2Scores.ai} | P2: ${p2Scores.player}`;
+        document.getElementById('score-p2').textContent = `Neuro: ${p2Scores.ai} | Você: ${p2Scores.player}`;
     }
 }
 
@@ -716,6 +711,12 @@ function p2Animate() {
 window.addEventListener('resize', () => {
     if (p2Renderer) { p2Renderer.setSize(innerWidth, innerHeight); p2UpdateLayout(); }
 });
-window.addEventListener('load', initPage2);
+window.addEventListener('load', () => {
+    initPage2();
+    // Auto-start audio on page load (requires prior user gesture from previous page)
+    setTimeout(() => { if (typeof p2InitHum === 'function') p2InitHum(); }, 500);
+});
 </script>
+
+<nav id="site-nav" style="position:fixed;bottom:0;left:0;right:0;z-index:99999;display:flex;justify-content:center;align-items:center;gap:12px;padding:14px 24px;background:linear-gradient(to top,rgba(0,0,0,0.9) 60%,transparent 100%);pointer-events:auto;"><div style="display:flex;gap:6px;align-items:center;"><div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);"></div><div style="width:5px;height:5px;border-radius:50%;background:#00ffff;box-shadow:0 0 8px #00ffff;"></div><div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);"></div><div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);"></div><div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);"></div><div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);"></div><div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);"></div></div><button style="background:none;border:1px solid #00ffff;color:#00ffff;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:0.35em;text-transform:uppercase;padding:10px 24px;cursor:pointer;" onclick="window.location.href='index.html'">← Voltar</button><button style="background:none;border:1px solid #00ffff;color:#00ffff;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:0.35em;text-transform:uppercase;padding:10px 24px;cursor:pointer;" onclick="window.location.href='escafandro.html'">Próximo →</button></nav>
 </body></html>
