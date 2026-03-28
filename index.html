@@ -216,7 +216,7 @@
             transition: opacity 1.2s ease;
         }
         .fly-icon {
-            width: 70px; height: 70px; margin-bottom: 20px;
+            width: 45px; height: 45px; margin-bottom: 14px;
             filter: drop-shadow(0 0 12px rgba(0,255,255,0.6));
             animation: float-fly 3s infinite ease-in-out;
         }
@@ -537,7 +537,7 @@
     </div>
 
     <!-- FLY ANIMATION -->
-    <svg class="fly-icon" viewBox="0 0 100 100" fill="none" style="margin:0.8rem 0;">
+    <svg class="fly-icon" viewBox="0 0 100 100" fill="none" style="margin:0.8rem 0;width:45px;height:45px;">
         <path class="wing-l" d="M45 45C30 30 15 45 10 55C15 65 30 65 45 55" stroke="#00ffff" stroke-width="2"/>
         <path class="wing-r" d="M55 45C70 30 85 45 90 55C85 65 70 65 55 55" stroke="#00ffff" stroke-width="2"/>
         <ellipse cx="50" cy="55" rx="6" ry="12" fill="#00ffff"/>
@@ -663,7 +663,7 @@ function initPage1() {
     p1Renderer.setPixelRatio(devicePixelRatio);
     p1Scene  = new THREE.Scene();
     p1Camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 1000);
-    p1Camera.position.z = 6;
+    p1Camera.position.z = 10;
     p1FlyGroup = new THREE.Group();
     p1Scene.add(p1FlyGroup);
     buildFly();
@@ -834,6 +834,17 @@ window.addEventListener('load', initPage1);
     background:linear-gradient(to top,rgba(0,0,0,0.85) 60%,transparent 100%);
     pointer-events:auto;
 ">
+    <button style="
+        background:none;
+        border:1px solid rgba(255,204,51,0.6);
+        color:#ffcc33;
+        font-family:'JetBrains Mono',monospace;
+        font-size:8px;
+        letter-spacing:0.35em;
+        text-transform:uppercase;
+        padding:10px 24px;
+        cursor:pointer;
+    " onclick="window.scrollTo(0,0);document.getElementById('splash1').style.opacity='1';document.getElementById('splash1').style.display='flex';document.getElementById('p1-next').style.display='none';">← Índice</button>
     <button style="
         background:none;
         border:1px solid #00ffff;
