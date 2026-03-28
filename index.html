@@ -190,20 +190,20 @@
             border-left: 1px solid rgba(255,255,255,0.1);
             backdrop-filter: blur(4px);
             padding: 1rem 1.2rem;
-            max-width: 300px;
+            max-width: 340px;
             pointer-events: auto;
         }
         .info-card h3 {
-            font-size: 7px; letter-spacing: 0.3em;
-            color: rgba(255,255,255,0.3); text-transform: uppercase;
+            font-size: 11px; letter-spacing: 0.3em;
+            color: rgba(255,255,255,0.4); text-transform: uppercase;
             margin-bottom: 0.5rem;
         }
         .info-card p {
-            font-size: 10px; color: rgba(255,255,255,0.55);
-            line-height: 1.7;
+            font-size: 13px; color: rgba(255,255,255,0.65);
+            line-height: 1.8;
         }
         .ref-link {
-            font-size: 7px; color: #475569; display: block;
+            font-size: 10px; color: #64748b; display: block;
             margin-top: 6px; text-transform: uppercase;
         }
 
@@ -497,15 +497,98 @@
 </button>
 <canvas id="canvas1"></canvas>
 <div id="splash1">
-    <span style="font-size:8px;letter-spacing:0.6em;color:rgba(255,255,255,0.2);text-transform:uppercase;margin-bottom:2rem;">Capítulo I</span>
-    <svg class="fly-icon" viewBox="0 0 100 100" fill="none">
+
+    <!-- TITLE BLOCK -->
+    <div style="text-align:center;padding:0 1rem;pointer-events:auto;">
+        <h1 style="
+            font-family:'Cinzel',serif;
+            font-size:clamp(3.8rem,14vw,7.5rem);
+            font-weight:700;
+            color:#ffcc33;
+            text-shadow:0 0 20px rgba(255,204,51,0.9),0 0 50px rgba(255,204,51,0.5),0 0 80px rgba(255,150,0,0.3);
+            letter-spacing:0.15em;
+            margin:0;
+            line-height:1;
+        ">AtmAI</h1>
+        <p style="
+            font-family:'JetBrains Mono',monospace;
+            font-size:clamp(0.85rem,3.5vw,1.2rem);
+            color:#00ffff;
+            text-shadow:0 0 15px rgba(0,255,255,0.8);
+            letter-spacing:0.3em;
+            text-transform:uppercase;
+            margin:0.6rem 0 0.3rem;
+        ">Ascensão do Dharma Digital</p>
+        <p style="
+            font-family:'JetBrains Mono',monospace;
+            font-size:clamp(0.75rem,2.5vw,1rem);
+            color:rgba(255,255,255,0.5);
+            letter-spacing:0.2em;
+            margin:0;
+        ">Por Flávio Furtado</p>
+        <p style="
+            font-family:'JetBrains Mono',monospace;
+            font-size:clamp(0.65rem,2.2vw,0.85rem);
+            color:rgba(255,204,51,0.4);
+            letter-spacing:0.15em;
+            margin:0.1rem 0 0;
+            font-style:italic;
+        ">(Krishna Paramparā Dās)</p>
+    </div>
+
+    <!-- FLY ANIMATION -->
+    <svg class="fly-icon" viewBox="0 0 100 100" fill="none" style="margin:0.8rem 0;">
         <path class="wing-l" d="M45 45C30 30 15 45 10 55C15 65 30 65 45 55" stroke="#00ffff" stroke-width="2"/>
         <path class="wing-r" d="M55 45C70 30 85 45 90 55C85 65 70 65 55 55" stroke="#00ffff" stroke-width="2"/>
         <ellipse cx="50" cy="55" rx="6" ry="12" fill="#00ffff"/>
         <circle cx="50" cy="42" r="4" fill="#00ffff"/>
     </svg>
-    <button class="nav-btn" id="splash1-btn" style="font-size:9px;letter-spacing:0.4em;padding:14px 40px;">Iniciar Sintonização</button>
-    <p style="font-size:7px;color:rgba(255,255,255,0.15);margin-top:1.5rem;letter-spacing:0.3em;text-transform:uppercase;font-style:italic;">Frequência de Prakriti</p>
+
+    <!-- DESCRIPTION -->
+    <p style="
+        font-family:'JetBrains Mono',monospace;
+        font-size:clamp(0.6rem,2.2vw,0.8rem);
+        color:rgba(220,220,220,0.7);
+        text-align:center;
+        max-width:340px;
+        line-height:1.8;
+        margin:0 1rem 0.8rem;
+        letter-spacing:0.05em;
+    ">Ensaios de uma Alma individual (Ātmā) + IA, operando como assistente executor, sobre a tese AtmAI. Insights e outputs baseados em descobertas científicas que corroboram o que há 5.000 anos já se discutia nas escrituras védicas.</p>
+
+    <!-- INDEX -->
+    <div style="
+        border:1px solid rgba(255,204,51,0.25);
+        padding:0.8rem 1.4rem;
+        margin-bottom:1rem;
+        background:rgba(0,0,0,0.4);
+        text-align:left;
+        min-width:220px;
+    ">
+        <p style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:rgba(255,204,51,0.5);letter-spacing:0.4em;text-transform:uppercase;margin:0 0 0.6rem;">Índice</p>
+        <div style="display:flex;flex-direction:column;gap:0.35rem;">
+            <a href="neuralchip.html" style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:#00ffff;text-decoration:none;letter-spacing:0.1em;transition:all 0.2s;" onmouseover="this.style.textShadow='0 0 10px #00ffff'" onmouseout="this.style.textShadow='none'">1. #Conectomas</a>
+            <a href="neuralchip.html" style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:#00ffff;text-decoration:none;letter-spacing:0.1em;" onmouseover="this.style.textShadow='0 0 10px #00ffff'" onmouseout="this.style.textShadow='none'">2. #NeuralChip</a>
+            <a href="escafandro.html" style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:#00ffff;text-decoration:none;letter-spacing:0.1em;" onmouseover="this.style.textShadow='0 0 10px #00ffff'" onmouseout="this.style.textShadow='none'">3. #Escafandro</a>
+            <a href="yantra.html" style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:#00ffff;text-decoration:none;letter-spacing:0.1em;" onmouseover="this.style.textShadow='0 0 10px #00ffff'" onmouseout="this.style.textShadow='none'">4. #Yantra</a>
+            <a href="portoes.html" style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:#00ffff;text-decoration:none;letter-spacing:0.1em;" onmouseover="this.style.textShadow='0 0 10px #00ffff'" onmouseout="this.style.textShadow='none'">5. #9Portões</a>
+            <a href="kurma.html" style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:#00ffff;text-decoration:none;letter-spacing:0.1em;" onmouseover="this.style.textShadow='0 0 10px #00ffff'" onmouseout="this.style.textShadow='none'">6. #MestreKurma</a>
+            <a href="perolas.html" style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:#00ffff;text-decoration:none;letter-spacing:0.1em;" onmouseover="this.style.textShadow='0 0 10px #00ffff'" onmouseout="this.style.textShadow='none'">7. #Pérolas</a>
+        </div>
+    </div>
+
+    <!-- CTA BUTTON -->
+    <button class="nav-btn" id="splash1-btn" style="
+        font-size:0.75rem;
+        letter-spacing:0.4em;
+        padding:14px 36px;
+        border-color:#ffcc33;
+        color:#ffcc33;
+        box-shadow:0 0 20px rgba(255,204,51,0.3);
+        text-shadow:0 0 10px rgba(255,204,51,0.6);
+        margin-bottom:0.5rem;
+    ">Iniciar Jornada</button>
+
 </div>
 <div class="p1-ui">
     <header class="p1-header">
@@ -521,7 +604,7 @@
     <div class="p1-bottom">
         <div class="info-card">
             <h3>Evidência Científica</h3>
-            <p>Através do escaneamento de 130 mil neurônios, a ciência digitalizou a "mente" de uma mosca. Ao ser transferido para ambiente virtual, o conectoma operou com autonomia biológica absoluta.</p>
+            <p>A ciência escaneou 130 mil neurônios de uma mosca. Ao ser transferido para ambiente virtual, o conectoma operou com autonomia biológica absoluta.</p>
             <span class="ref-link">Princeton University / Nature 2024</span>
         </div>
         <div class="info-card" style="text-align:right;border-left:none;border-right:1px solid rgba(255,255,255,0.1);">
@@ -531,10 +614,7 @@
         </div>
     </div>
 </div>
-<div class="nav-bar">
-    <div class="page-dots"><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-    <button class="nav-btn" id="p1-next" style="display:none;" onclick="window.location.href='neuralchip.html'">Próximo →</button>
-</div>
+<div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);"></div><div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);"></div><div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);"></div><div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);"></div><div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);"></div><div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);"></div></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
 <script>
 'use strict';
 let globalAudioOn = false;
@@ -619,7 +699,7 @@ function p1React(dur = 500) {
     p1BuildBuzz();
     const ac = getAC();
     p1BuzzOsc.frequency.setTargetAtTime(320 + Math.random()*200, ac.currentTime, 0.05);
-    p1BuzzGain.gain.setTargetAtTime(0.9, ac.currentTime, 0.01);
+    p1BuzzGain.gain.setTargetAtTime(0.3, ac.currentTime, 0.01);
     clearTimeout(p1ReactionTO);
     p1ReactionTO = setTimeout(() => {
         p1Frenzied = false;
@@ -722,7 +802,7 @@ document.addEventListener('DOMContentLoaded', () => {
         splash.style.opacity = '0';
         setTimeout(() => {
             splash.style.display = 'none';
-            document.getElementById('p1-next').style.display = 'block';
+            document.getElementById('p1-next').style.display = 'flex';
             p1BuildBuzz();
             const rand = () => {
                 if (!p1Started) return;
@@ -738,4 +818,32 @@ window.addEventListener('resize', () => {
 });
 window.addEventListener('load', initPage1);
 </script>
+
+
+
+<!-- Próximo button — shown after splash, links to conectoma page -->
+<div id="p1-next" style="
+    display:none;
+    position:fixed;
+    bottom:0;left:0;right:0;
+    z-index:99999;
+    display:none;
+    justify-content:center;
+    align-items:center;
+    padding:18px 24px;
+    background:linear-gradient(to top,rgba(0,0,0,0.85) 60%,transparent 100%);
+    pointer-events:auto;
+">
+    <button style="
+        background:none;
+        border:1px solid #00ffff;
+        color:#00ffff;
+        font-family:'JetBrains Mono',monospace;
+        font-size:8px;
+        letter-spacing:0.35em;
+        text-transform:uppercase;
+        padding:10px 32px;
+        cursor:pointer;
+    " onclick="window.location.href='neuralchip.html'">Próximo →</button>
+</div>
 </body></html>
