@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kūrma: Consciência Pura</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #fbbf24;
+            --gold-glow: #ff9800;
+            --dark-bg: #050505;
+            --neon-glow: 0 0 20px rgba(251, 191, 36, 0.7), 0 0 40px rgba(251, 191, 36, 0.5);
+            /* Duração da transição para um despertar gradual */
+            --meditation-speed: 6.5s;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: var(--dark-bg);
+            color: #e2d1a4;
+            font-family: 'Lora', serif;
+            overflow: hidden;
+            transition: background-color var(--meditation-speed) ease-in-out;
+        }
+
+        #canvas-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 30;
+            pointer-events: none;
+        }
+
+        /* Overlay de brilho místico - Expansão etérea */
+        #mystic-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 15;
+            pointer-events: none;
+            background: radial-gradient(circle at center, rgba(255, 152, 0, 0.25) 0%, transparent 70%);
+            transition: opacity var(--meditation-speed) ease-in-out, 
+                        transform var(--meditation-speed) ease-in-out;
+            opacity: 0;
+            transform: scale(0.7);
+        }
+
+        .meditation-active-overlay {
+            opacity: 1 !important;
+            transform: scale(1.4) !important;
+            background: radial-gradient(circle at center, rgba(255, 120, 0, 0.4) 0%, rgba(255, 152, 0, 0.15) 50%, transparent 85%) !important;
+        }
+
+        .app-shell {
+            position: relative;
+            z-index: 50;
+            height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            align-items: center;
+            padding: 1rem;
+            pointer-events: none;
+        }
+
+        .verse-section {
+            width: 100%;
+            max-width: 950px;
+            min-height: 180px; /* Garante espaço para o texto não pular */
+            margin: 0 auto;
+            text-align: center;
+            pointer-events: auto;
+            padding: 2.5rem 1.5rem 1rem 1.5rem;
+            background: linear-gradient(to bottom, rgba(5,5,5,1) 0%, rgba(5,5,5,0.7) 70%, transparent 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .sanskrit {
+            font-size: 1.1rem;
+            color: var(--gold);
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 15px rgba(251, 191, 36, 0.6);
+            line-height: 1.6;
+        }
+
+        .reference {
+            font-family: 'Cinzel', serif;
+            font-size: 0.75rem;
+            color: var(--gold);
+            opacity: 0.8;
+            margin-bottom: 1rem;
+            letter-spacing: 0.2em;
+        }
+
+        .translation {
+            font-size: 1.15rem;
+            line-height: 1.5;
+            font-style: italic;
+            color: var(--gold);
+            text-shadow: 2px 2px 6px rgba(0,0,0,1);
+            font-weight: 400;
+            /* Impede que o texto quebre ou mude de layout abruptamente */
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .character-section {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 45vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: auto;
+            z-index: 5;
+            
+            -webkit-mask-image: 
+                linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%),
+                radial-gradient(circle at center, black 70%, transparent 100%);
+            mask-image: 
+                linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%),
+                radial-gradient(circle at center, black 70%, transparent 100%);
+            
+            -webkit-mask-composite: source-in;
+            mask-composite: intersect;
+        }
+
+        .sketchfab-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Transição de filtro e transform muito lenta para evitar o efeito "lâmpada" */
+            transition: filter var(--meditation-speed) ease-in-out, 
+                        transform var(--meditation-speed) ease-in-out;
+            /* Estado inicial neutro para o navegador calcular o gradiente do efeito */
+            filter: brightness(1) saturate(1) drop-shadow(0 0 0px rgba(0,0,0,0));
+            transform: scale(1) translateY(0);
+        }
+
+        .sketchfab-embed {
+            position: absolute;
+            width: 140%; 
+            height: 140%; 
+            top: -20%;  
+            left: -20%; 
+            border: none;
+        }
+
+        .controls-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 90px;
+            pointer-events: auto;
+            background: linear-gradient(to top, rgba(5,5,5,1) 0%, transparent 100%);
+        }
+
+        #meditation-trigger {
+            border: 1px solid rgba(251, 191, 36, 0.5);
+            padding: 0.8rem 1.8rem;
+            color: var(--gold);
+            background: rgba(5, 5, 5, 0.6);
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 0.15em;
+            white-space: nowrap;
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.1);
+            text-shadow: 0 0 5px rgba(251, 191, 36, 0.5);
+            border-radius: 4px;
+            font-family: 'Cinzel', serif;
+            font-size: 0.7rem;
+        }
+
+        #meditation-trigger:hover {
+            background: rgba(251, 191, 36, 0.2);
+            border-color: var(--gold);
+            transform: translateY(-2px);
+            box-shadow: var(--neon-glow);
+        }
+
+        /* O brilho e saturação agora "aquecem" em vez de ligar */
+        .meditation-active-character {
+            filter: 
+                brightness(1.55) 
+                saturate(2.4) 
+                drop-shadow(0 0 35px rgba(255, 150, 0, 0.7)) 
+                drop-shadow(0 0 65px rgba(255, 100, 0, 0.45)) !important;
+            transform: scale(0.85) translateY(12px) !important;
+        }
+
+        .hint-text {
+            margin-top: 1.5rem;
+            font-size: 0.55rem;
+            opacity: 0.4;
+            letter-spacing: 0.4em;
+            color: var(--gold);
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 768px) {
+            .sketchfab-embed {
+                width: 180%;
+                height: 180%;
+                top: -40%;
+                left: -40%;
+            }
+            .verse-section { min-height: 220px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="mystic-overlay"></div>
+    <div id="canvas-background"></div>
+
+    <div class="app-shell">
+        
+        <header class="verse-section">
+            <p class="sanskrit">यदा संहरते चायं कूर्मोऽङ्गानीv सर्वशः ।<br>इन्द्रियाणीन्द्रियार्थेभ्यस्तस्य प्रज्ञा प्रतिष्ठिता ॥</p>
+            <p class="reference">Bhagavad-gītā 2.58</p>
+            <p class="translation">
+                "Aquele que é capaz de retirar seus sentidos dos objetos dos sentidos, assim como a tartaruga recolhe seus membros para dentro do casco, está firmemente fixo em consciência perfeita."
+            </p>
+        </header>
+
+        <section class="character-section">
+            <div class="sketchfab-wrapper" id="sketchfab-wrapper">
+                <iframe 
+                    id="turtle-frame"
+                    class="sketchfab-embed"
+                    title="Mestre Kūrma" 
+                    src="https://sketchfab.com/models/e2fa8d266ff2441fb8f780d37ab4de05/embed?autostart=1&camera=0&ui_controls=0&ui_infos=0&ui_watermark=0&transparent=1&dnt=1" 
+                    allow="autoplay; fullscreen">
+                </iframe>
+            </div>
+        </section>
+
+        <footer class="controls-section">
+            <button id="meditation-trigger" onclick="toggleMeditation()">
+                Retrair Sentidos e Expandir Consciência
+            </button>
+            <p class="hint-text cinzel">O despertar é um processo contínuo</p>
+        </footer>
+
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r132/three.min.js"></script>
+<script>
+let scene, camera, renderer, starPoints;
+        let isMeditating = false;
+        
+        // Controle suave de animação para as partículas
+        let currentRotationY = 0.0006;
+        let currentRotationZ = 0.0001;
+
+        function createCircleTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128;
+            canvas.height = 128;
+            const ctx = canvas.getContext('2d');
+            const gradient = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.8)');
+            gradient.addColorStop(0.5, 'rgba(255, 200, 50, 0.4)');
+            gradient.addColorStop(1, 'rgba(255, 150, 0, 0)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 128, 128);
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000000, 0); 
+            document.getElementById('canvas-background').appendChild(renderer.domElement);
+
+            const particlesGeometry = new THREE.BufferGeometry();
+            const count = 750;
+            const positions = new Float32Array(count * 3);
+
+            for(let i = 0; i < count; i++) {
+                const radius = 1.1 + Math.random() * 4.0; 
+                const angle = Math.random() * Math.PI * 2;
+                positions[i * 3] = Math.cos(angle) * radius; 
+                positions[i * 3 + 1] = (Math.random() - 0.5) * 6.5; 
+                positions[i * 3 + 2] = Math.sin(angle) * radius; 
+            }
+            
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.09,
+                map: createCircleTexture(),
+                transparent: true,
+                opacity: 0.35,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false
+            });
+
+            starPoints = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(starPoints);
+
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Transição gradual da velocidade (lerp lento)
+            const targetRotY = isMeditating ? 0.045 : 0.0006;
+            const targetRotZ = isMeditating ? 0.018 : 0.0001;
+            
+            currentRotationY = (currentRotationY + (targetRotY - (currentRotationY)) * (0.008));
+            currentRotationZ = (currentRotationZ + (targetRotZ - (currentRotationZ)) * (0.008));
+            
+            starPoints.rotation.y += currentRotationY;
+            starPoints.rotation.z += currentRotationZ;
+            
+            // Transição gradual de escala e cor
+            const lerpStep = 0.01; 
+            const targetScale = isMeditating ? 0.4 : 1.0;
+            starPoints.scale.x = (starPoints.scale.x + (targetScale - (starPoints.scale.x)) * (lerpStep));
+            starPoints.scale.y = (starPoints.scale.y + (targetScale - (starPoints.scale.y)) * (lerpStep));
+            starPoints.scale.z = (starPoints.scale.z + (targetScale - (starPoints.scale.z)) * (lerpStep));
+
+            const targetColor = isMeditating ? 0xffbb33 : 0xede0bb;
+            starPoints.material.color.lerp(new THREE.Color(targetColor), lerpStep * 1.5);
+            
+            const targetOpacity = isMeditating ? 0.9 : 0.35;
+            starPoints.material.opacity = (starPoints.material.opacity + (targetOpacity - (starPoints.material.opacity)) * (lerpStep));
+
+            const time = Date.now() * 0.002;
+            const targetPulse = isMeditating ? (Math.sin(time * 3.5) * 0.06 + 0.2) : 0.08;
+            starPoints.material.size = (starPoints.material.size + (targetPulse - (starPoints.material.size)) * (0.04));
+
+            renderer.render(scene, camera);
+        }
+
+        function toggleMeditation() {
+            isMeditating = !isMeditating;
+            const wrapper = document.getElementById('sketchfab-wrapper');
+            const overlay = document.getElementById('mystic-overlay');
+            const btn = document.getElementById('meditation-trigger');
+            
+            if(isMeditating) {
+                wrapper.classList.add('meditation-active-character');
+                overlay.classList.add('meditation-active-overlay');
+                btn.innerText = "Sustentar Consciência Plena";
+            } else {
+                wrapper.classList.remove('meditation-active-character');
+                overlay.classList.remove('meditation-active-overlay');
+                btn.innerText = "Retrair Sentidos e Expandir Consciência";
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        document.addEventListener("DOMContentLoaded", init);
+</script>
+
+
+<nav id="site-nav" style="position:fixed;bottom:0;left:0;right:0;z-index:99999;display:flex;justify-content:center;align-items:center;gap:12px;padding:14px 24px;background:linear-gradient(to top,rgba(0,0,0,0.9) 60%,transparent 100%);pointer-events:auto;"><div style="display:flex;gap:6px;align-items:center;"><div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);"></div><div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);"></div><div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);"></div><div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);"></div><div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);"></div><div style="width:5px;height:5px;border-radius:50%;background:#00ffff;box-shadow:0 0 8px #00ffff;"></div><div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);"></div></div><button style="background:none;border:1px solid #00ffff;color:#00ffff;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:0.35em;text-transform:uppercase;padding:10px 24px;cursor:pointer;" onclick="window.location.href='portoes.html'">← Voltar</button><button style="background:none;border:1px solid #00ffff;color:#00ffff;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:0.35em;text-transform:uppercase;padding:10px 24px;cursor:pointer;" onclick="window.location.href='astronauta.html'">Próximo →</button></nav>
+</body>
+</html>
+
