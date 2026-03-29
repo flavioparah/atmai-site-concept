@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AtmAI — I · Conectoma de Prakriti</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;400;700&family=Playfair+Display:ital,wght@0,400;0,900;1,400&family=Cinzel:wght@400;700&family=Syncopate:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -140,14 +140,14 @@
         .p1-ui {
             position: absolute; inset: 0; z-index: 10;
             display: flex; flex-direction: column;
-            justify-content: space-between;
+            justify-content: flex-start; gap: 1rem;
             pointer-events: none;
             padding: 2rem 2rem 0;
         }
 
         .p1-header {
             text-align: center;
-            padding-top: 1.5rem;
+            padding-top: 0.5rem;
         }
         .p1-chapter {
             font-size: 8px; letter-spacing: 0.6em;
@@ -156,7 +156,7 @@
         }
         .p1-quote {
             font-family: 'Playfair Display', serif;
-            font-size: clamp(0.85rem, 2.5vw, 1.25rem);
+            font-size: clamp(0.7rem, 2vw, 0.95rem);
             font-style: italic;
             color: rgba(255,255,255,0.9);
             line-height: 1.7;
@@ -181,8 +181,12 @@
         }
 
         .p1-bottom {
+            position: absolute;
+            bottom: 5rem;
+            left: 1rem;
+            right: 1rem;
             display: flex; justify-content: space-between; align-items: flex-end;
-            gap: 1rem; margin-bottom: 5rem;
+            gap: 1rem;
             flex-wrap: wrap;
         }
         .info-card {
@@ -292,10 +296,10 @@
             pointer-events: none;
             padding: 1.5rem 2rem;
             display: flex; flex-direction: column;
-            justify-content: space-between;
+            justify-content: flex-start; gap: 1rem;
         }
         .p3-header {
-            display: flex; justify-content: space-between; align-items: flex-start;
+            display: flex; justify-content: flex-start; gap: 1rem; align-items: flex-start;
         }
         .sat-cit {
             font-family: 'Syncopate', sans-serif;
@@ -366,7 +370,7 @@
 
         .p3-trigger-area {
             display: flex; justify-content: center; pointer-events: auto;
-            margin-bottom: 5rem;
+            margin-bottom: 1rem;
         }
         #main-trigger-p3 {
             width: 100%; max-width: 420px;
@@ -422,7 +426,7 @@
             position: absolute; inset: 0; z-index: 10;
             pointer-events: none;
             display: flex; flex-direction: column;
-            justify-content: space-between;
+            justify-content: flex-start; gap: 1rem;
             padding: 1rem 1.2rem;
         }
         .glass-panel {
@@ -468,10 +472,10 @@
             max-width: 480px;
             margin: 0 auto;
             width: 100%;
-            margin-bottom: 5rem;
+            margin-bottom: 1rem;
         }
         .guna-labels {
-            display: flex; justify-content: space-between;
+            display: flex; justify-content: flex-start; gap: 1rem;
             font-size: 9px; color: #444; font-weight: 700; margin-bottom: 8px;
         }
         .guna-lbl.active-guna { color: var(--cyan); text-shadow: 0 0 8px var(--cyan); }
@@ -490,12 +494,11 @@
     
     </style>
 </head>
-<body>
+<body style="display:flex;align-items:center;justify-content:center;min-height:100vh;overflow-y:auto;overflow-x:hidden;">
 <button id="global-audio-btn" title="Áudio">
     <span class="audio-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M2 4H4L7 1.5V10.5L4 8H2V4ZM8.5 3.5C9.5 4.5 9.5 7.5 8.5 8.5"/></svg></span>
     <span id="audio-btn-label">SOM OFF</span>
 </button>
-<canvas id="canvas1"></canvas>
 <div id="splash1">
 
     <!-- TITLE BLOCK -->
@@ -578,7 +581,7 @@
     </div>
 
     <!-- CTA BUTTON -->
-    <button class="nav-btn" id="splash1-btn" style="
+    <button class="nav-btn" id="splash1-btn" onclick="window.location.href='conectoma.html'" style="
         font-size:0.75rem;
         letter-spacing:0.4em;
         padding:14px 36px;
@@ -590,271 +593,28 @@
     ">Iniciar Jornada</button>
 
 </div>
-<div class="p1-ui">
-    <header class="p1-header">
-        <span class="p1-chapter">Capítulo I · Conectoma de Prakriti</span>
-        <p class="p1-quote">"A alma espiritual julga-se a autora de atividades que, na verdade, são executadas pelos três modos da natureza material."</p>
-        <div class="guna-tags">
-            <span class="guna-tag sattva">SATTVA</span>
-            <span class="guna-tag rajas">RAJAS</span>
-            <span class="guna-tag tamas">TAMAS</span>
-        </div>
-        <span class="gita-ref">Bhagavad-Gita 3.27</span>
-    </header>
-    <div class="p1-bottom">
-        <div class="info-card">
-            <h3>Evidência Científica</h3>
-            <p>A ciência escaneou 130 mil neurônios de uma mosca. Ao ser transferido para ambiente virtual, o conectoma operou com autonomia biológica absoluta.</p>
-            <span class="ref-link">Princeton University / Nature 2024</span>
-        </div>
-        <div class="info-card" style="text-align:right;border-left:none;border-right:1px solid rgba(255,255,255,0.1);">
-            <h3>Conclusão Ontológica</h3>
-            <p>A arquitetura neural é a interface mecânica através da qual os Gunas operam. A "vontade" é o resultado da execução desse algoritmo material.</p>
-            <span class="ref-link">Ontologia AtmAI · Atma como Observadora</span>
-        </div>
-    </div>
-</div>
-<div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);"></div><div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);"></div><div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);"></div><div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);"></div><div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);"></div><div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.2);"></div></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
 <script>
 'use strict';
 let globalAudioOn = false;
 let AC = null;
-function getAC() {
-    if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
-    if (AC.state === 'suspended') AC.resume();
-    return AC;
-}
+function getAC() { if(!AC) AC=new(window.AudioContext||window.webkitAudioContext)(); if(AC.state==='suspended') AC.resume(); return AC; }
 let masterOut = null;
-function getMaster() {
-    if (!masterOut) {
-        const ac = getAC();
-        masterOut = ac.createGain();
-        masterOut.gain.value = 0;
-        masterOut.connect(ac.destination);
-    }
-    return masterOut;
-}
+function getMaster() { if(!masterOut){ const ac=getAC(); masterOut=ac.createGain(); masterOut.gain.value=0; masterOut.connect(ac.destination); } return masterOut; }
 function setGlobalAudio(on) {
-    globalAudioOn = on;
-    const gb = document.getElementById('global-audio-btn');
-    const gl = document.getElementById('audio-btn-label');
-    if (gb) gb.classList.toggle('audio-on', on);
-    if (gl) gl.textContent = on ? 'SOM ON' : 'SOM OFF';
-    getMaster().gain.setTargetAtTime(on ? 1.0 : 0, getAC().currentTime, 0.3);
+    globalAudioOn=on;
+    const gb=document.getElementById('global-audio-btn');
+    const gl=document.getElementById('audio-btn-label');
+    if(gb) gb.classList.toggle('audio-on',on);
+    if(gl) gl.textContent=on?'SOM ON':'SOM OFF';
+    getMaster().gain.setTargetAtTime(on?1:0,getAC().currentTime,0.3);
 }
-document.addEventListener('DOMContentLoaded', () => {
-    const gb = document.getElementById('global-audio-btn');
-    if (gb) gb.addEventListener('click', () => setGlobalAudio(!globalAudioOn));
+document.addEventListener('DOMContentLoaded',()=>{
+    const gb=document.getElementById('global-audio-btn');
+    if(gb) gb.addEventListener('click',()=>setGlobalAudio(!globalAudioOn));
+    // Iniciar Jornada goes to conectoma
+    const btn = document.getElementById('splash1-btn');
+    if(btn) btn.addEventListener('click',()=>{ window.location.href='conectoma.html'; });
 });
-// ═══════════════════════════════════════════════════════════════
-// PAGE 1 — MOSCA / CONECTOMA
-// ═══════════════════════════════════════════════════════════════
-let p1Init = false;
-let p1Renderer, p1Scene, p1Camera, p1FlyGroup;
-let p1MouseX = 0, p1MouseY = 0;
-let p1Frenzied = false, p1Started = false, p1ReactionTO;
-let p1BuzzOsc, p1BuzzGain;
-
-function initPage1() {
-    p1Init = true;
-    const canvas = document.getElementById('canvas1');
-    p1Renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    p1Renderer.setSize(innerWidth, innerHeight);
-    p1Renderer.setPixelRatio(devicePixelRatio);
-    p1Scene  = new THREE.Scene();
-    p1Camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 1000);
-    p1Camera.position.z = 10;
-    p1FlyGroup = new THREE.Group();
-    p1Scene.add(p1FlyGroup);
-    buildFly();
-    p1Animate();
-
-    window.addEventListener('mousemove', e => {
-        // standalone
-        p1MouseX = (e.clientX - innerWidth/2) / 200;
-        p1MouseY = (e.clientY - innerHeight/2) / 200;
-    });
-    document.addEventListener('mousedown',   () => { if (p1Started) p1React(800); });
-    document.addEventListener('touchstart',  () => { if (p1Started) p1React(800); }, { passive: true });
-}
-
-function p1BuildBuzz() {
-    if (p1BuzzOsc) return; // already built
-    const ac = getAC();
-    p1BuzzOsc  = ac.createOscillator(); p1BuzzOsc.type = 'sawtooth'; p1BuzzOsc.frequency.value = 280;
-    p1BuzzGain = ac.createGain(); p1BuzzGain.gain.value = 0;
-    p1BuzzOsc.connect(p1BuzzGain);
-    p1BuzzGain.connect(getMaster());
-    p1BuzzOsc.start();
-}
-
-function p1React(dur = 500) {
-    // Visual frenzy — always
-    p1Frenzied = true;
-    clearTimeout(p1ReactionTO);
-    p1ReactionTO = setTimeout(() => { p1Frenzied = false; }, dur);
-
-    // Audio — only if global sound is on
-    if (!globalAudioOn) return;
-    p1BuildBuzz();
-    const ac = getAC();
-    p1BuzzOsc.frequency.setTargetAtTime(320 + Math.random()*200, ac.currentTime, 0.05);
-    p1BuzzGain.gain.setTargetAtTime(0.3, ac.currentTime, 0.01);
-    clearTimeout(p1ReactionTO);
-    p1ReactionTO = setTimeout(() => {
-        p1Frenzied = false;
-        p1BuzzGain.gain.setTargetAtTime(0, ac.currentTime, 0.08);
-    }, dur);
-}
-
-function p1Silence() {
-    if (p1BuzzGain) p1BuzzGain.gain.setTargetAtTime(0, getAC().currentTime, 0.1);
-}
-
-function buildFly() {
-    const matHead  = new THREE.PointsMaterial({ color: 0xa855f7, size: 0.022, transparent: true, opacity: 0.85 });
-    const matEye   = new THREE.PointsMaterial({ color: 0x00ffff, size: 0.016, transparent: true, opacity: 0.95 });
-    const matRajas = new THREE.PointsMaterial({ color: 0xff4444, size: 0.022, transparent: true, opacity: 0.6 });
-    const matTamas = new THREE.PointsMaterial({ color: 0x888888, size: 0.022, transparent: true, opacity: 0.6 });
-    const matWing  = new THREE.PointsMaterial({ color: 0xccffff, size: 0.022, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending });
-
-    const headG = new THREE.SphereGeometry(0.5, 32, 32); headG.scale(1.1, 0.9, 0.8);
-    p1FlyGroup.add(new THREE.Points(headG, matHead));
-    const eyeG = new THREE.SphereGeometry(0.4, 20, 20);
-    const eyeL = new THREE.Points(eyeG, matEye); eyeL.position.set(-0.4, 0.1, 0.2);
-    const eyeR = eyeL.clone(); eyeR.position.x = 0.4;
-    p1FlyGroup.add(eyeL, eyeR);
-    const thoraxG = new THREE.SphereGeometry(0.75, 32, 32);
-    const thorax = new THREE.Points(thoraxG, matRajas); thorax.position.z = -0.7;
-    p1FlyGroup.add(thorax);
-    const abdG = new THREE.SphereGeometry(0.85, 32, 32); abdG.scale(0.8, 0.7, 1.4);
-    const abd = new THREE.Points(abdG, matTamas); abd.position.set(0, -0.2, -1.8);
-    p1FlyGroup.add(abd);
-    const legPts = [];
-    for (let i = 0; i < 6; i++) {
-        const side = i < 3 ? 1 : -1, row = i % 3, zPos = -0.6 - row*0.4;
-        for (let j = 0; j < 10; j++) {
-            const t = j/10;
-            legPts.push(new THREE.Vector3(side*(0.5+t*0.6), -t*0.7, zPos));
-        }
-    }
-    p1FlyGroup.add(new THREE.Points(new THREE.BufferGeometry().setFromPoints(legPts), matRajas));
-    const mkWing = side => {
-        const pts = [];
-        for (let i = 0; i < 1500; i++) {
-            const r = Math.sqrt(Math.random()), θ = (Math.random()-0.5)*Math.PI*1.3;
-            pts.push(new THREE.Vector3(side*r*Math.cos(θ)*2.5, r*Math.sin(θ)*1.5, (Math.random()-0.5)*0.05));
-        }
-        const wc = new THREE.Group();
-        const wp = new THREE.Points(new THREE.BufferGeometry().setFromPoints(pts), matWing);
-        wp.position.set(side*0.5, 0.2, 0);
-        wc.add(wp); wc.userData.side = side;
-        wc.position.set(side*0.1, 0.4, -0.8);
-        return wc;
-    };
-    p1FlyGroup.add(mkWing(-1), mkWing(1));
-}
-
-function p1Animate() {
-    requestAnimationFrame(p1Animate);
-    // standalone
-    const t = Date.now()*0.001;
-    if (p1Started) {
-        if (p1Frenzied) {
-            p1FlyGroup.position.x = (Math.random()-0.5)*0.15;
-            p1FlyGroup.position.y = (Math.random()-0.5)*0.15;
-            p1FlyGroup.position.z = (Math.random()-0.5)*0.15;
-        } else {
-            p1FlyGroup.position.lerp(new THREE.Vector3(0, Math.sin(t*2)*0.1, 0), 0.05);
-            p1FlyGroup.rotation.y += (p1MouseX - p1FlyGroup.rotation.y)*0.05;
-            p1FlyGroup.rotation.x += (p1MouseY - p1FlyGroup.rotation.x)*0.05;
-        }
-        p1FlyGroup.children.forEach(c => {
-            if (c.userData && c.userData.side) {
-                if (p1Frenzied) {
-                    c.rotation.z = Math.sin(Date.now()*0.06)*1.2*c.userData.side;
-                    c.rotation.y = Math.cos(Date.now()*0.06)*0.5;
-                } else {
-                    c.rotation.z = THREE.MathUtils.lerp(c.rotation.z, 0.15*c.userData.side, 0.1);
-                    c.rotation.y = THREE.MathUtils.lerp(c.rotation.y, 0.45*c.userData.side, 0.1);
-                }
-            }
-        });
-    } else {
-        p1FlyGroup.rotation.y += 0.01;
-    }
-    p1Renderer.render(p1Scene, p1Camera);
-}
-
-window.addEventListener('resize', () => {
-    if (p1Renderer) {
-        p1Renderer.setSize(innerWidth, innerHeight);
-        p1Camera.aspect = innerWidth/innerHeight;
-        p1Camera.updateProjectionMatrix();
-    }
-});
-window.addEventListener('load', initPage1);
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('splash1-btn').addEventListener('click', () => {
-        setGlobalAudio(true);
-        p1Started = true;
-        const splash = document.getElementById('splash1');
-        splash.style.opacity = '0';
-        setTimeout(() => {
-            splash.style.display = 'none';
-            document.getElementById('p1-next').style.display = 'flex';
-            p1BuildBuzz();
-            const rand = () => {
-                if (!p1Started) return;
-                if (Math.random() > 0.75) p1React(300 + Math.random() * 700);
-                setTimeout(rand, 1000 + Math.random() * 3000);
-            };
-            rand();
-        }, 1200);
-    });
-});
-window.addEventListener('resize', () => {
-    if (p1Renderer) { p1Renderer.setSize(innerWidth, innerHeight); p1Camera.aspect = innerWidth/innerHeight; p1Camera.updateProjectionMatrix(); }
-});
-window.addEventListener('load', initPage1);
 </script>
-
-
-
-<!-- Próximo button — shown after splash, links to conectoma page -->
-<div id="p1-next" style="
-    display:none;
-    position:fixed;
-    bottom:0;left:0;right:0;
-    z-index:99999;
-    display:none;
-    justify-content:center;
-    align-items:center;
-    padding:18px 24px;
-    background:linear-gradient(to top,rgba(0,0,0,0.85) 60%,transparent 100%);
-    pointer-events:auto;
-">
-    <button style="
-        background:none;
-        border:1px solid rgba(255,204,51,0.6);
-        color:#ffcc33;
-        font-family:'JetBrains Mono',monospace;
-        font-size:8px;
-        letter-spacing:0.35em;
-        text-transform:uppercase;
-        padding:10px 24px;
-        cursor:pointer;
-    " onclick="window.scrollTo(0,0);document.getElementById('splash1').style.opacity='1';document.getElementById('splash1').style.display='flex';document.getElementById('p1-next').style.display='none';">← Índice</button>
-    <button style="
-        background:none;
-        border:1px solid #00ffff;
-        color:#00ffff;
-        font-family:'JetBrains Mono',monospace;
-        font-size:8px;
-        letter-spacing:0.35em;
-        text-transform:uppercase;
-        padding:10px 32px;
-        cursor:pointer;
-    " onclick="window.location.href='neuralchip.html'">Próximo →</button>
-</div>
-</body></html>
+</body>
+</html>
