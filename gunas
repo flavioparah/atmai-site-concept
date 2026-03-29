@@ -1,1 +1,527 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Escala de Hawkins 3D - Ciência e Consciência</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; overflow: hidden; background: radial-gradient(circle at center, #0f0f1a 0%, #000000 100%); font-family: 'Segoe UI', Roboto, sans-serif; color: white; touch-action: none; }
+        canvas { display: block; }
+        
+        #interface {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 15px;
+            z-index: 10;
+        }
+
+        .header-box {
+            background: rgba(0, 0, 0, 0.45); 
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 90%;
+            pointer-events: auto;
+            align-self: center;
+            margin-top: 5px;
+        }
+
+        #hawkins-description {
+            position: absolute;
+            left: 20px;
+            top: 100px;
+            max-width: 280px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+            pointer-events: auto;
+            font-size: 11px;
+            line-height: 1.4;
+            color: rgba(255,255,255,0.9);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+        }
+
+        #hawkins-description h3 {
+            color: #E0B0FF;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .touch-instruction {
+            display: block;
+            margin-top: 10px;
+            text-align: right;
+            font-size: 9px;
+            color: #00FFFF;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+        }
+
+        #audio-container {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .audio-btn {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .audio-btn.active {
+            border-color: #E0B0FF;
+            background: rgba(147, 112, 219, 0.3);
+            box-shadow: 0 0 30px rgba(147, 112, 219, 0.5);
+        }
+
+        #nav-footer {
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            pointer-events: auto;
+        }
+
+        .nav-btn {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid #00FFFF;
+            color: #00FFFF;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 8px 25px;
+            border-radius: 4px;
+            box-shadow: 0 0 12px rgba(0, 255, 255, 0.3), inset 0 0 5px rgba(0, 255, 255, 0.1);
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+        }
+
+        .nav-btn:hover {
+            background: #00FFFF;
+            color: black;
+            box-shadow: 0 0 25px #00FFFF;
+            text-shadow: none;
+        }
+
+        .labels-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .annotation {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            pointer-events: auto;
+            white-space: nowrap;
+            will-change: transform;
+        }
+
+        .annotation.active {
+            filter: brightness(1.8) drop-shadow(0 0 10px currentColor);
+            z-index: 100;
+        }
+
+        .line {
+            height: 1.5px;
+            background: rgba(255,255,255,0.6);
+            margin-right: 8px;
+            width: 30px;
+        }
+
+        .label-content {
+            display: flex;
+            align-items: center;
+            background: rgba(0,0,0,0.4);
+            padding: 2px 8px;
+            border-radius: 4px;
+            backdrop-filter: blur(4px);
+        }
+
+        .label-text {
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .freq-badge {
+            color: #fff;
+            margin-right: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            font-weight: bold;
+            border-right: 1px solid rgba(255,255,255,0.3);
+            padding-right: 8px;
+        }
+
+        @media (max-width: 768px) {
+            #hawkins-description {
+                left: auto;
+                right: 15px;
+                top: auto;
+                bottom: 110px;
+                max-width: 220px;
+                font-size: 10px;
+                padding: 12px;
+                text-align: right;
+                background: rgba(0, 0, 0, 0.7);
+                border-right: 3px solid #E0B0FF;
+                border-left: none;
+            }
+            #hawkins-description h3 {
+                font-size: 11px;
+                margin-bottom: 4px;
+            }
+            .touch-instruction {
+                font-size: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="interface">
+    <div class="header-box">
+        <h2 class="text-yellow-500 font-bold text-base md:text-xl mb-1 italic">Bhagavad-gītā Como Ele É - 14.9</h2>
+        <p class="text-[11px] md:text-sm leading-snug opacity-95 text-yellow-100 font-medium drop-shadow-md">
+            "O modo da bondade condiciona à felicidade; o da paixão à ação fruitiva; e o da ignorância, cobrindo o conhecimento, ata à loucura."
+        </p>
+    </div>
+
+    <div id="hawkins-description">
+        <h3>Escala de Hawkins</h3>
+        <p>Desenvolvida pelo Dr. David Hawkins através de décadas de pesquisa em <b>cinesiologia aplicada</b>, esta escala mapeia os níveis de consciência humana em logaritmos de frequência (Hz) com cores correspondentes. Quanto mais baixa a frequência, mais restritivo.</p>
+        <span class="touch-instruction">Toque nas auréolas para transmutar</span>
+    </div>
+
+    <div id="labels-container" class="labels-layer"></div>
+    
+    <div id="audio-container">
+        <button id="music-toggle" class="audio-btn">
+            <span id="music-icon" style="font-size: 24px;">🔇</span>
+        </button>
+        <div class="text-[8px] mt-2 opacity-40 uppercase text-right tracking-widest">Som Meditativo</div>
+    </div>
+
+    <div id="nav-footer">
+        <button class="nav-btn">Voltar</button>
+        <button class="nav-btn">Avançar</button>
+    </div>
+</div>
+
+<script>
+    const scaleData = [
+        { level: 700, label: "Iluminação", color: "#E0B0FF" },
+        { level: 600, label: "Paz", color: "#BF94E4" },
+        { level: 540, label: "Alegria", color: "#9370DB" },
+        { level: 500, label: "Amor", color: "#FF69B4" },
+        { level: 400, label: "Razão", color: "#4169E1" },
+        { level: 350, label: "Aceitação", color: "#1E90FF" },
+        { level: 310, label: "Boa vontade", color: "#00FA9A" },
+        { level: 250, label: "Neutralidade", color: "#32CD32" },
+        { level: 200, label: "Coragem", color: "#FFFF00" },
+        { level: 175, label: "Orgulho", color: "#FFD700" },
+        { level: 150, label: "Raiva", color: "#FFA500" },
+        { level: 125, label: "Desejo", color: "#FF8C00" },
+        { level: 100, label: "Medo", color: "#FF4500" },
+        { level: 75, label: "Tristeza", color: "#FF0000" },
+        { level: 50, label: "Apatia", color: "#D32F2F" },
+        { level: 30, label: "Culpa", color: "#B71C1C" },
+        { level: 20, label: "Vergonha", color: "#7F0000" }
+    ];
+
+    let scene, camera, renderer, mainContainer;
+    let rings = [];
+    let raycaster = new THREE.Raycaster();
+    let mouse = new THREE.Vector2();
+    let isDragging = false;
+    let previousMouse = { x: 0, y: 0 };
+    let rotationTarget = new THREE.Quaternion();
+    let rotationCurrent = new THREE.Quaternion();
+
+    let audioCtx = null;
+    let masterGain = null;
+    let audioEnabled = false;
+    let baseDrone = null;
+
+    function initAudioContext() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            masterGain = audioCtx.createGain();
+            masterGain.connect(audioCtx.destination);
+            masterGain.gain.setValueAtTime(0, audioCtx.currentTime);
+        }
+    }
+
+    function toggleAudio(forceOn = false) {
+        initAudioContext();
+        if (forceOn) audioEnabled = true;
+        else audioEnabled = !audioEnabled;
+        const btn = document.getElementById('music-toggle');
+        const icon = document.getElementById('music-icon');
+        if (audioEnabled) {
+            btn.classList.add('active');
+            icon.innerText = '🔊';
+            masterGain.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 1.5);
+            startDrone();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        } else {
+            btn.classList.remove('active');
+            icon.innerText = '🔇';
+            masterGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1);
+            setTimeout(stopDrone, 1100);
+        }
+    }
+
+    function startDrone() {
+        if (baseDrone || !audioCtx) return;
+        baseDrone = audioCtx.createOscillator();
+        const droneGain = audioCtx.createGain();
+        baseDrone.type = 'sine';
+        baseDrone.frequency.value = 60; 
+        droneGain.gain.value = 0.08;
+        baseDrone.connect(droneGain);
+        droneGain.connect(masterGain);
+        baseDrone.start();
+    }
+
+    function stopDrone() {
+        if (baseDrone) {
+            try { baseDrone.stop(); } catch(e) {}
+            baseDrone = null;
+        }
+    }
+
+    function playLevel(level) {
+        if (!audioEnabled || !audioCtx) return;
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = level > 400 ? 'sine' : 'triangle';
+        osc.frequency.setValueAtTime(level, now);
+        g.gain.setValueAtTime(0, now);
+        g.gain.linearRampToValueAtTime(0.12, now + 0.1);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 3);
+        osc.connect(g);
+        g.connect(masterGain);
+        osc.start();
+        osc.stop(now + 3);
+        highlightRing(level);
+    }
+
+    function updateMainContainerPosition() {
+        if (!mainContainer) return;
+        mainContainer.position.x = window.innerWidth < 768 ? -5.5 : 0;
+    }
+
+    function init() {
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 0, 35);
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        document.body.appendChild(renderer.domElement);
+        
+        mainContainer = new THREE.Group();
+        updateMainContainerPosition();
+        
+        scene.add(mainContainer);
+        scene.add(new THREE.AmbientLight(0xffffff, 1.2));
+        const pLight = new THREE.PointLight(0xffffff, 2.0);
+        pLight.position.set(20, 30, 40);
+        scene.add(pLight);
+
+        const reversedData = [...scaleData].reverse();
+        reversedData.forEach((item, index) => {
+            const radius = 0.7 + (index * 0.4);
+            const yPos = (index * 1.1) - 9;
+            const ringGeo = new THREE.TorusGeometry(radius, 0.14, 16, 100);
+            const ringMat = new THREE.MeshPhongMaterial({ color: item.color, emissive: item.color, emissiveIntensity: 0.6, transparent: true, opacity: 0.95 });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            ring.rotation.x = Math.PI / 2;
+            ring.position.y = yPos;
+            ring.userData = { ...item, originalRadius: radius };
+            
+            const circleGeo = new THREE.CircleGeometry(radius, 32);
+            const circleMat = new THREE.MeshBasicMaterial({ color: item.color, transparent: true, opacity: 0.15, side: THREE.DoubleSide });
+            const circle = new THREE.Mesh(circleGeo, circleMat);
+            circle.rotation.x = Math.PI / 2;
+            circle.position.y = yPos;
+            circle.userData = { level: item.level };
+
+            mainContainer.add(ring);
+            mainContainer.add(circle);
+            rings.push({ mesh: ring, data: item });
+        });
+
+        const starGeo = new THREE.BufferGeometry();
+        const starPos = new Float32Array(1000 * 3);
+        for(let i=0; i<1000*3; i++) starPos[i] = (Math.random() - 0.5) * 150;
+        starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+        scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ size: 0.05, color: 0xaaaaff, transparent: true, opacity: 0.4 })));
+
+        createLabels();
+        setupInteractions();
+        animate();
+        setTimeout(() => toggleAudio(true), 1000);
+    }
+
+    function createLabels() {
+        const container = document.getElementById('labels-container');
+        container.innerHTML = '';
+        rings.forEach((ringObj) => {
+            const div = document.createElement('div');
+            div.className = 'annotation';
+            div.style.color = ringObj.data.color;
+            div.innerHTML = `
+                <div class="line" style="background: ${ringObj.data.color}"></div>
+                <div class="label-content">
+                    <span class="freq-badge">${ringObj.data.level === 700 ? '700+' : ringObj.data.level}</span>
+                    <span class="label-text">${ringObj.data.label}</span>
+                </div>
+            `;
+            container.appendChild(div);
+            ringObj.div = div;
+        });
+    }
+
+    function setupInteractions() {
+        const getPos = (e) => ({
+            x: e.touches ? e.touches[0].clientX : e.clientX,
+            y: e.touches ? e.touches[0].clientY : e.clientY
+        });
+        const check = (pos) => {
+            mouse.x = (pos.x / window.innerWidth) * 2 - 1;
+            mouse.y = -(pos.y / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            const hits = raycaster.intersectObjects(mainContainer.children);
+            if (hits.length > 0) {
+                const level = hits[0].object.userData.level;
+                if (level) playLevel(level);
+            }
+        };
+        const onStart = (e) => { 
+            isDragging = true; 
+            previousMouse = getPos(e); 
+            if (!audioEnabled) toggleAudio(true);
+            check(previousMouse); 
+        };
+        const onMove = (e) => {
+            const pos = getPos(e);
+            if (isDragging) {
+                const dx = pos.x - previousMouse.x;
+                const dy = pos.y - previousMouse.y;
+                const dq = new THREE.Quaternion().setFromEuler(new THREE.Euler(dy * 0.005, dx * 0.005, 0, 'XYZ'));
+                rotationTarget.multiplyQuaternions(dq, rotationTarget);
+                previousMouse = pos;
+                check(pos);
+            }
+        };
+        window.addEventListener('mousedown', onStart);
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('mouseup', () => isDragging = false);
+        window.addEventListener('touchstart', onStart, { passive: false });
+        window.addEventListener('touchmove', onMove, { passive: false });
+        window.addEventListener('touchend', () => isDragging = false);
+        document.getElementById('music-toggle').addEventListener('click', (e) => { e.stopPropagation(); toggleAudio(); });
+    }
+
+    function highlightRing(level) {
+        rings.forEach(r => {
+            if (r.data.level === level) {
+                r.mesh.scale.set(1.4, 1.4, 1.4);
+                r.mesh.material.emissiveIntensity = 2.5;
+                r.div.classList.add('active');
+                setTimeout(() => {
+                    r.mesh.scale.set(1, 1, 1);
+                    r.mesh.material.emissiveIntensity = 0.6;
+                    r.div.classList.remove('active');
+                }, 1000);
+            }
+        });
+    }
+
+    function updateLabels() {
+        rings.forEach((ringObj) => {
+            const vector = new THREE.Vector3();
+            vector.setFromMatrixPosition(ringObj.mesh.matrixWorld);
+            const radius = ringObj.mesh.userData.originalRadius;
+            const labelPos = new THREE.Vector3(radius, 0, 0);
+            labelPos.applyQuaternion(ringObj.mesh.quaternion);
+            labelPos.applyQuaternion(mainContainer.quaternion);
+            vector.add(labelPos);
+            const tempV = vector.clone().project(camera);
+            const x = (tempV.x * 0.5 + 0.5) * window.innerWidth;
+            const y = (tempV.y * -0.5 + 0.5) * window.innerHeight;
+            ringObj.div.style.transform = `translate(${x}px, ${y}px)`;
+            ringObj.div.style.display = (tempV.z > 1 || x < 0 || x > window.innerWidth) ? 'none' : 'flex';
+        });
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        rotationCurrent.slerp(rotationTarget, 0.1);
+        mainContainer.quaternion.copy(rotationCurrent);
+        if (!isDragging) {
+            rotationTarget.multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(0, 0.003, 0)));
+        }
+        updateLabels();
+        renderer.render(scene, camera);
+    }
+
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        updateMainContainerPosition();
+    });
+
+    window.onload = init;
+</script>
+</body>
+</html>
+
 
