@@ -127,7 +127,6 @@
             padding: 0 20px;
         }
 
-        /* Rodapé com botões próximos mas com respiro */
         .go-footer {
             width: 100%;
             display: flex;
@@ -140,7 +139,7 @@
 
         .footer-group {
             display: flex;
-            gap: 10px; /* Pequeno espaço entre os botões */
+            gap: 10px;
             align-items: center;
         }
 
@@ -185,7 +184,6 @@
             text-shadow: 0 0 10px #f00;
         }
 
-        /* Estilo para o Logo do Chip Neural */
         .neural-logo {
             width: 120px;
             height: 120px;
@@ -209,30 +207,21 @@
 
     <!-- Tela Inicial -->
     <div id="overlay-screen">
-        <!-- Logotipo de Chip Neural (SVG) -->
         <svg class="neural-logo" viewBox="0 0 100 100">
-            <!-- Base do Chip -->
             <rect x="25" y="25" width="50" height="50" fill="none" stroke="#f00" stroke-width="2" />
             <rect x="35" y="35" width="30" height="30" fill="#f00" opacity="0.3" />
-            
-            <!-- Conexões Externas (Pinos) -->
             <line x1="25" y1="35" x2="15" y2="35" stroke="#f00" stroke-width="2" />
             <line x1="25" y1="50" x2="15" y2="50" stroke="#f00" stroke-width="2" />
             <line x1="25" y1="65" x2="15" y2="65" stroke="#f00" stroke-width="2" />
-            
             <line x1="75" y1="35" x2="85" y2="35" stroke="#f00" stroke-width="2" />
             <line x1="75" y1="50" x2="85" y2="50" stroke="#f00" stroke-width="2" />
             <line x1="75" y1="65" x2="85" y2="65" stroke="#f00" stroke-width="2" />
-            
             <line x1="35" y1="25" x2="35" y2="15" stroke="#f00" stroke-width="2" />
             <line x1="50" y1="25" x2="50" y2="15" stroke="#f00" stroke-width="2" />
             <line x1="65" y1="25" x2="65" y2="15" stroke="#f00" stroke-width="2" />
-            
             <line x1="35" y1="75" x2="35" y2="85" stroke="#f00" stroke-width="2" />
             <line x1="50" y1="75" x2="50" y2="85" stroke="#f00" stroke-width="2" />
             <line x1="65" y1="75" x2="65" y2="85" stroke="#f00" stroke-width="2" />
-
-            <!-- Estrutura Sináptica Central -->
             <circle cx="50" cy="50" r="8" fill="none" stroke="#fff" stroke-width="1" />
             <path d="M50 42 L50 30 M58 50 L70 50 M50 58 L50 70 M42 50 L30 50" stroke="#fff" stroke-width="1" />
             <circle cx="50" cy="30" r="2" fill="#fff" />
@@ -473,6 +462,28 @@
             return group;
         }
 
+        // Função de Explosão de Sangue
+        function createExplosion(pos) {
+            const particleCount = 15;
+            const geo = new THREE.BoxBufferGeometry(0.3, 0.3, 0.3);
+            const mat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+            for(let i = 0; i < particleCount; i++) {
+                const p = new THREE.Mesh(geo, mat);
+                p.position.copy(pos);
+                p.userData = {
+                    vel: new THREE.Vector3(
+                        (Math.random() - 0.5) * 1.5,
+                        (Math.random() - 0.5) * 1.5,
+                        (Math.random() - 0.5) * 1.5
+                    ),
+                    life: 1.0
+                };
+                particles.push(p);
+                scene.add(p);
+            }
+            playSound(100, 'sawtooth', 0.1, 0.03); // Som de impacto/explosão
+        }
+
         function fire() {
             if(!isPlaying) return;
             playSound(160 + Math.random() * 40, 'square', 0.08, 0.05);
@@ -488,4 +499,127 @@
             const dir = new THREE.Vector3().subVectors(targetPos, originPos).normalize();
             bullet.userData = { vel: dir.multiplyScalar(10.0) };
             bullet.lookAt(targetPos);
-            bullet
+            bullets.push(bullet);
+            scene.add(bullet);
+            muzzleLight.intensity = 30;
+            muzzleFire.visible = true;
+            setTimeout(() => { muzzleLight.intensity = 0; muzzleFire.visible = false; }, 35);
+        }
+
+        function setupControls() {
+            document.getElementById('btn-start').addEventListener('click', () => { 
+                initAudio(); 
+                document.getElementById('overlay-screen').style.display = 'none'; 
+                isPlaying = true; 
+            });
+            document.getElementById('btn-retry').addEventListener('click', () => { location.reload(); });
+            const onDown = (e) => { 
+                if(!isPlaying || e.target.closest('button')) return; 
+                const t = e.touches ? e.touches[0] : e; 
+                touchStart.x = t.clientX; touchStart.y = t.clientY; 
+                isPressing = true; fire(); fireTimer = 0; 
+            };
+            const onMove = (e) => { 
+                if(!isPressing) return; 
+                const t = e.touches ? e.touches[0] : e; 
+                lookRotation.y -= (t.clientX - touchStart.x) * 0.004; 
+                lookRotation.x -= (t.clientY - touchStart.y) * 0.004; 
+                lookRotation.x = Math.max(-Math.PI/4, Math.min(Math.PI/4, lookRotation.x)); 
+                camera.quaternion.setFromEuler(lookRotation); 
+                touchStart.x = t.clientX; touchStart.y = t.clientY; 
+            };
+            window.addEventListener('mousedown', onDown); 
+            window.addEventListener('mousemove', onMove); 
+            window.addEventListener('mouseup', () => isPressing = false);
+            window.addEventListener('touchstart', onDown, {passive: false}); 
+            window.addEventListener('touchmove', onMove, {passive: false}); 
+            window.addEventListener('touchend', () => isPressing = false);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const dt = clock.getDelta();
+            if(isPlaying) {
+                gameTime += dt; 
+                const worldSpeed = 0.3 + (gameTime * 0.001); 
+                tunnelLines.forEach(tl => { 
+                    tl.z += worldSpeed * 1.5; 
+                    if(tl.z > 20) tl.z = -1000; 
+                    tl.mesh.position.z = tl.z; 
+                });
+                
+                // Spawn de Inimigos
+                if(Math.random() < 0.025) { 
+                    const en = createRudi(); 
+                    enemies.push(en); 
+                    scene.add(en); 
+                }
+
+                // Autofire
+                if(isPressing) { 
+                    fireTimer += dt; 
+                    if(fireTimer > 0.08) { fire(); fireTimer = 0; } 
+                }
+
+                // Update Partículas de Sangue
+                for(let i = particles.length - 1; i >= 0; i--) {
+                    const p = particles[i];
+                    p.position.add(p.userData.vel);
+                    p.userData.life -= dt * 1.5;
+                    p.scale.setScalar(p.userData.life);
+                    if(p.userData.life <= 0) {
+                        scene.remove(p);
+                        particles.splice(i, 1);
+                    }
+                }
+
+                // Update Bullets e Colisões
+                for(let i=bullets.length-1; i>=0; i--) {
+                    const b = bullets[i]; 
+                    b.position.add(b.userData.vel);
+                    if(b.position.distanceTo(camera.position) > 350) { 
+                        scene.remove(b); 
+                        bullets.splice(i, 1); 
+                        continue; 
+                    }
+                    for(let j=enemies.length-1; j>=0; j--) {
+                        const en = enemies[j];
+                        if(b.position.distanceTo(en.position) < en.userData.radius) {
+                            createExplosion(en.position); // Efeito sanguíneo
+                            scene.remove(en); 
+                            enemies.splice(j, 1); 
+                            scene.remove(b); 
+                            bullets.splice(i, 1);
+                            score++; 
+                            document.getElementById('kills').innerText = score; 
+                            break;
+                        }
+                    }
+                }
+
+                // Update Inimigos e Dano ao Jogador
+                for(let i=enemies.length-1; i>=0; i--) {
+                    const en = enemies[i]; 
+                    en.position.z += worldSpeed * 2.2;
+                    if(en.position.z > 10) {
+                        health -= 10; 
+                        document.getElementById('hp').innerText = Math.max(0, health) + "%";
+                        scene.remove(en); 
+                        enemies.splice(i, 1);
+                        if(health <= 0) { 
+                            isPlaying = false; 
+                            document.getElementById('final-score').innerText = score; 
+                            document.getElementById('game-over-screen').style.display = 'flex'; 
+                            playGameOverVignette();
+                        }
+                    }
+                }
+            }
+            renderer.render(scene, camera);
+        }
+        window.onload = init;
+    </script>
+</body>
+</html>
+
+
