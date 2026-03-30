@@ -270,20 +270,34 @@
 
     <div id="flash"></div>
 
-    <div id="hud">
-        <button class="nav-btn" id="btn-voltar">VOLTAR</button>
-        <div class="center-stats">
-            <div class="stat-box">
-                <div class="stat-label">SINAPSE</div>
-                <div class="stat-value" id="hp">100%</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">AMOSTRAS</div>
-                <div class="stat-value" id="kills">0</div>
-            </div>
-        </div>
-        <button class="nav-btn" id="btn-avancar">AVANÇAR</button>
+    <div class="go-footer">
+    <div class="footer-group">
+        <button class="nav-btn" onclick="location.href='cap09.html'">VOLTAR</button>
+        
+        <button id="btn-retry" class="nav-btn restart-btn">REINICIAR</button>
+        
+        <button class="nav-btn" onclick="location.href='cap10.html'">AVANÇAR</button>
     </div>
+</div>
+
+<div id="flash"></div>
+
+<div id="hud">
+    <button class="nav-btn" id="btn-voltar" onclick="location.href='cap09.html'">VOLTAR</button>
+    
+    <div class="center-stats">
+        <div class="stat-box">
+            <div class="stat-label">SINAPSE</div>
+            <div class="stat-value" id="hp">100%</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">AMOSTRAS</div>
+            <div class="stat-value" id="kills">0</div>
+        </div>
+    </div>
+    
+    <button class="nav-btn" id="btn-avancar" onclick="location.href='cap10.html'">AVANÇAR</button>
+</div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
