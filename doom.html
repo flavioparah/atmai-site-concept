@@ -1,314 +1,36 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Neural Doom: Classic Tunnel</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
-        body {
-            margin: 0;
-            overflow: hidden;
-            background-color: #050505;
-            font-family: 'Press Start 2P', cursive;
-            user-select: none;
-            touch-action: none;
-        }
-
-        #scientific-header {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(20, 0, 0, 0.9);
-            border-bottom: 2px solid #f00;
-            padding: 8px;
-            font-family: monospace;
-            font-size: 10px;
-            color: #f00;
-            z-index: 200;
-            pointer-events: none;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        #hud {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 100px;
-            background: #111;
-            border-top: 4px solid #f00;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 100;
-            padding: 0 10px;
-            box-sizing: border-box;
-        }
-
-        .center-stats {
-            display: flex;
-            gap: 10px;
-            flex: 2;
-            justify-content: center;
-        }
-
-        .stat-box {
-            background: #000;
-            border: 2px solid #f00;
-            padding: 8px;
-            text-align: center;
-            min-width: 85px;
-        }
-
-        .stat-label { font-size: 7px; color: #f00; margin-bottom: 4px; }
-        .stat-value { font-size: 14px; color: #fff; text-shadow: 0 0 8px #f00; }
-
-        .nav-btn {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 8px;
-            padding: 12px 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            min-width: 70px;
-            white-space: nowrap;
-            background: #000;
-            border: 2px solid #00f7ff;
-            color: #00f7ff;
-            box-shadow: inset 0 0 10px rgba(0, 247, 255, 0.2);
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
-        }
-
-        .nav-btn:active {
-            background: #00f7ff;
-            color: #000;
-        }
-
-        .nav-btn.restart-btn {
-            border-color: #f00;
-            color: #f00;
-            box-shadow: inset 0 0 10px rgba(255, 0, 0, 0.2);
-            font-size: 9px;
-            min-width: 120px;
-            z-index: 2;
-        }
-
-        #overlay-screen, #game-over-screen {
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle, #001a2a 0%, #000 100%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            color: #fff;
-            text-align: center;
-            padding: 20px;
-        }
-
-        #game-over-screen {
-            display: none;
-            background: radial-gradient(circle, #2a0000 0%, #000 100%);
-            justify-content: space-between;
-            padding: 40px 0 0 0;
-            box-sizing: border-box;
-        }
-
-        .go-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            padding: 0 20px;
-        }
-
-        .go-footer {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 30px 0;
-            border-top: 1px solid rgba(255, 0, 0, 0.2);
-            background: rgba(0, 0, 0, 0.9);
-        }
-
-        .footer-group {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .scientific-log {
-            max-width: 600px;
-            text-align: left;
-            font-family: monospace;
-            font-size: 10px;
-            line-height: 1.4;
-            color: #00f7ff;
-            margin-bottom: 20px;
-            border-left: 4px solid #00f7ff;
-            padding: 12px;
-            background: rgba(0, 40, 60, 0.4);
-        }
-
-        .game-over-log {
-            color: #f00;
-            border-color: #f00;
-            background: rgba(60, 0, 0, 0.4);
-            font-size: 9px;
-        }
-
-        .btn-action {
-            background: #000;
-            color: #f00;
-            border: 4px solid #f00;
-            padding: 15px 30px;
-            font-family: 'Press Start 2P', cursive;
-            cursor: pointer;
-            font-size: 11px;
-            box-shadow: 0 0 15px rgba(255, 0, 0, 0.4);
-            margin-bottom: 10px;
-        }
-
-        #flash { position: absolute; inset: 0; pointer-events: none; z-index: 160; transition: background 0.05s; }
-        
-        .score-display {
-            font-size: 18px;
-            color: #fff;
-            margin: 10px 0;
-            text-shadow: 0 0 10px #f00;
-        }
-
-        .neural-logo {
-            width: 120px;
-            height: 120px;
-            margin-bottom: 10px;
-            filter: drop-shadow(0 0 10px #f00);
-            animation: pulse-logo 3s infinite ease-in-out;
-        }
-
-        @keyframes pulse-logo {
-            0%, 100% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.05); opacity: 1; }
-        }
-    </style>
-</head>
-<body>
-
-    <div id="scientific-header">
-        <span>CORTICAL // v6.2</span>
-        <span>MODO: FULL YELLOW ARSENAL</span>
-    </div>
-
-    <div id="overlay-screen">
-        <svg class="neural-logo" viewBox="0 0 100 100">
-            <rect x="25" y="25" width="50" height="50" fill="none" stroke="#f00" stroke-width="2" />
-            <rect x="35" y="35" width="30" height="30" fill="#f00" opacity="0.3" />
-            <line x1="25" y1="35" x2="15" y2="35" stroke="#f00" stroke-width="2" />
-            <line x1="25" y1="50" x2="15" y2="50" stroke="#f00" stroke-width="2" />
-            <line x1="25" y1="65" x2="15" y2="65" stroke="#f00" stroke-width="2" />
-            <line x1="75" y1="35" x2="85" y2="35" stroke="#f00" stroke-width="2" />
-            <line x1="75" y1="50" x2="85" y2="50" stroke="#f00" stroke-width="2" />
-            <line x1="75" y1="65" x2="85" y2="65" stroke="#f00" stroke-width="2" />
-            <line x1="35" y1="25" x2="35" y2="15" stroke="#f00" stroke-width="2" />
-            <line x1="50" y1="25" x2="50" y2="15" stroke="#f00" stroke-width="2" />
-            <line x1="65" y1="25" x2="65" y2="15" stroke="#f00" stroke-width="2" />
-            <line x1="35" y1="75" x2="35" y2="85" stroke="#f00" stroke-width="2" />
-            <line x1="50" y1="75" x2="50" y2="85" stroke="#f00" stroke-width="2" />
-            <line x1="65" y1="75" x2="65" y2="85" stroke="#f00" stroke-width="2" />
-            <circle cx="50" cy="50" r="8" fill="none" stroke="#fff" stroke-width="1" />
-            <path d="M50 42 L50 30 M58 50 L70 50 M50 58 L50 70 M42 50 L30 50" stroke="#fff" stroke-width="1" />
-            <circle cx="50" cy="30" r="2" fill="#fff" />
-            <circle cx="70" cy="50" r="2" fill="#fff" />
-            <circle cx="50" cy="70" r="2" fill="#fff" />
-            <circle cx="30" cy="50" r="2" fill="#fff" />
-        </svg>
-
-        <h1 style="color:#f00; text-shadow: 0 0 20px #f00; margin-bottom: 20px; font-size: 20px;">NEURALDOOM</h1>
-        
-        <div class="scientific-log">
-            [SISTEMA DE ARMAMENTO ATUALIZADO]<br>
-            > MUNIÇÃO: Projéteis plasmáticos amarelos.<br>
-            > IGNITORES: Fogo de boca amarelo.<br>
-            > LOGOTIPO: Chip Neural Sináptico V1.<br>
-            > STATUS: Pronto para conexão.
+<div id="hud">
+    <button class="nav-btn" id="btn-voltar" onclick="window.history.back()">VOLTAR</button>
+    <div class="center-stats">
+        <div class="stat-box">
+            <div class="stat-label">SINAPSE</div>
+            <div class="stat-value" id="hp">100%</div>
         </div>
-        
-        <button id="btn-start" class="btn-action">INICIAR SESSÃO</button>
-    </div>
-
-    <div id="game-over-screen">
-        <div class="go-content">
-            <h1 style="color:#f00; text-shadow: 0 0 20px #f00; margin-bottom: 5px; font-size: 18px;">SESSÃO ENCERRADA</h1>
-            <p style="font-size: 8px; margin-bottom: 10px;">SINAPSE DESCONECTADA</p>
-            
-            <div class="score-display">PONTUAÇÃO: <span id="final-score">0</span></div>
-
-            <div class="scientific-log game-over-log">
-                [RELATÓRIO EXPERIMENTAL DO CHIP NEURAL]<br><br>
-                > STATUS: Aprendizado Concluído.<br>
-                > OBSERVAÇÃO: O chip neural processou o ambiente com sucesso. Os padrões de reconhecimento foram otimizados.<br><br>
-                > CONCLUSÃO: Reinicie para nova coleta de dados.
-            </div>
-        </div>
-
-        <div class="go-footer">
-            <div class="footer-group">
-                <a href="cap09.html" class="nav-btn">VOLTAR</a>
-                <button id="btn-retry" class="nav-btn restart-btn">REINICIAR</button>
-                <a href="cap10.html" class="nav-btn">AVANÇAR</a>
-            </div>
+        <div class="stat-box">
+            <div class="stat-label">AMOSTRAS</div>
+            <div class="stat-value" id="kills">0</div>
         </div>
     </div>
+    <button class="nav-btn" id="btn-avancar" onclick="proximaFase()">AVANÇAR</button>
+</div>
 
-    <div id="flash"></div>
-
-    <div id="hud">
-        <a href="cap09.html" class="nav-btn" id="btn-voltar">VOLTAR</a>
-        <div class="center-stats">
-            <div class="stat-box">
-                <div class="stat-label">SINAPSE</div>
-                <div class="stat-value" id="hp">100%</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">AMOSTRAS</div>
-                <div class="stat-value" id="kills">0</div>
-            </div>
-        </div>
-        <a href="cap10.html" class="nav-btn" id="btn-avancar">AVANÇAR</a>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
-    <script>
-        let audioCtx;
-        function initAudio() { 
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
+<script>
+    // Adicione esta função para o botão Avançar
+    function proximaFase() {
+        if (score >= 10) {
+            alert("Acesso concedido ao Nível 2!");
+            // location.href = "fase2.html"; 
+        } else {
+            alert("Amostras insuficientes (Mínimo: 10)");
         }
+    }
 
-        function playSound(freq, type, dur, vol = 0.05) {
-            if (!audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = type;
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(Math.max(10, freq/10), audioCtx.currentTime + dur);
-            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + dur);
-        }
+    // Melhorei a função de redimensionamento para evitar quebras
+    window.addEventListener('resize', () => {
+        if (!camera || !renderer) return;
+        camera.aspect = window.innerWidth / (window.innerHeight - 100);
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight - 100);
+    });
 
-        function playGameOverVignette() {
-            if (!audioCtx) return;
-            const now = audioCtx.currentTime;
-            const notes = [220, 19
+    // Mantenha o resto do seu código de inicialização...
+</script>
