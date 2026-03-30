@@ -263,7 +263,7 @@
             <div class="footer-group">
                 <button class="nav-btn" onclick="location.reload()">VOLTAR</button>
                 <button id="btn-retry" class="nav-btn restart-btn">REINICIAR</button>
-                <button class="nav-btn" onclick="console.log('Next')">AVANÇAR</button>
+                <button class="nav-btn">AVANÇAR</button>
             </div>
         </div>
     </div>
@@ -462,7 +462,6 @@
             return group;
         }
 
-        // Função de Explosão de Sangue
         function createExplosion(pos) {
             const particleCount = 15;
             const geo = new THREE.BoxBufferGeometry(0.3, 0.3, 0.3);
@@ -481,7 +480,7 @@
                 particles.push(p);
                 scene.add(p);
             }
-            playSound(100, 'sawtooth', 0.1, 0.03); // Som de impacto/explosão
+            playSound(100, 'sawtooth', 0.1, 0.03);
         }
 
         function fire() {
@@ -548,20 +547,17 @@
                     tl.mesh.position.z = tl.z; 
                 });
                 
-                // Spawn de Inimigos
                 if(Math.random() < 0.025) { 
                     const en = createRudi(); 
                     enemies.push(en); 
                     scene.add(en); 
                 }
 
-                // Autofire
                 if(isPressing) { 
                     fireTimer += dt; 
                     if(fireTimer > 0.08) { fire(); fireTimer = 0; } 
                 }
 
-                // Update Partículas de Sangue
                 for(let i = particles.length - 1; i >= 0; i--) {
                     const p = particles[i];
                     p.position.add(p.userData.vel);
@@ -573,7 +569,6 @@
                     }
                 }
 
-                // Update Bullets e Colisões
                 for(let i=bullets.length-1; i>=0; i--) {
                     const b = bullets[i]; 
                     b.position.add(b.userData.vel);
@@ -585,7 +580,7 @@
                     for(let j=enemies.length-1; j>=0; j--) {
                         const en = enemies[j];
                         if(b.position.distanceTo(en.position) < en.userData.radius) {
-                            createExplosion(en.position); // Efeito sanguíneo
+                            createExplosion(en.position); 
                             scene.remove(en); 
                             enemies.splice(j, 1); 
                             scene.remove(b); 
@@ -597,7 +592,6 @@
                     }
                 }
 
-                // Update Inimigos e Dano ao Jogador
                 for(let i=enemies.length-1; i>=0; i--) {
                     const en = enemies[i]; 
                     en.position.z += worldSpeed * 2.2;
@@ -621,6 +615,3 @@
     </script>
 </body>
 </html>
-
-
-
